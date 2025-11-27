@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from AA_scenes import sceneClass, homeScene
 import pygame
 from typing import List

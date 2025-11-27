@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pygame
 from AA_utils.timer import Timer
 from typing import List
