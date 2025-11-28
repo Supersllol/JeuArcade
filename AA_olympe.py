@@ -1,43 +1,44 @@
 import pygame
-from AA_scenes import introScene
-
-FRAMERATE = 60
+from AA_scenes import introScene, gameScene
+from AA_utils import settings, inputManager
 
 
 def main():
     pygame.init()
 
-    mainApp = pygame.display.set_mode((1024, 768), pygame.NOFRAME)
-    currentScene = introScene.IntroScene(mainApp)
-    ACTIF = True
-    clock = pygame.time.Clock()
+    mainApp = pygame.display.set_mode(settings.WINDOW_SIZE, pygame.NOFRAME)
+    pygame.mouse.set_visible(False)
 
     # setup joysticks
-    joysticks = ()
+    joysticks = []
     joystickCount = pygame.joystick.get_count()
     if not joystickCount:
-        print("Aucun joystick connecté, veuillez réessayer.")
-        return
+        print("Aucun joystick connecté")
     else:
-        joystick0 = pygame.joystick.Joystick(0)
-        if joystickCount > 1:
-            joystick1 = pygame.joystick.Joystick(1)
-        else:
-            joystick1 = None
-        joysticks = (joystick0, joystick1)
+        for i in range(joystickCount):
+            joystick = pygame.joystick.Joystick(0)
+            joystick.init()
+            joysticks.append(joystick)
+    input = inputManager.InputManager(joysticks)
+
+    # currentScene = introScene.IntroScene(mainApp, input)
+    currentScene = gameScene.GameScene(mainApp, input)
+    ACTIF = True
+    clock = pygame.time.Clock()
 
     currentScene.initScene()
 
     while ACTIF:
-        if not currentScene.loopScene([event for event in pygame.event.get()],
-                                      joysticks):
+        if not currentScene.loopScene([event for event in pygame.event.get()]):
             ACTIF = False
 
         if currentScene.finished:
-            currentScene = currentScene.getTransition()
-            currentScene.initScene()
+            newScene = currentScene.getTransition()
+            if newScene:
+                newScene.initScene()
+                currentScene = newScene
 
-        clock.tick(FRAMERATE)
+        clock.tick(settings.FRAMERATE)
         pygame.display.flip()
 
     pygame.quit()
