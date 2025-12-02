@@ -1,12 +1,14 @@
 import pygame
 from AA_scenes import introScene, gameScene
-from AA_utils import settings, inputManager
+from AA_utils import settings, inputManager, countries, musicManager
+from AA_game import musicTrack, player
 
 
 def main():
     pygame.init()
 
-    mainApp = pygame.display.set_mode(settings.WINDOW_SIZE, pygame.NOFRAME)
+    mainApp = pygame.display.set_mode(settings.WINDOW_SIZE,
+                                      pygame.NOFRAME | pygame.SRCALPHA)
     pygame.mouse.set_visible(False)
 
     # setup joysticks
@@ -20,9 +22,14 @@ def main():
             joystick.init()
             joysticks.append(joystick)
     input = inputManager.InputManager(joysticks)
+    music = musicManager.MusicManager()
 
     # currentScene = introScene.IntroScene(mainApp, input)
-    currentScene = gameScene.GameScene(mainApp, input)
+    player0 = player.Player("SIM", countries.CountryFlags.Québec, 0, mainApp)
+    player1 = player.Player("MIS", countries.CountryFlags.Canada, 1, mainApp)
+    currentScene = gameScene.GameScene(mainApp, input, music,
+                                       musicTrack.GameTracks.SEMI_CHARMED_LIFE,
+                                       (player0, player1))
     ACTIF = True
     clock = pygame.time.Clock()
 

@@ -17,6 +17,14 @@ class ButtonInputs(Enum):
     SELECT = 9
 
 
+moveBindings = {
+    0: ButtonInputs.A,
+    1: ButtonInputs.B,
+    2: ButtonInputs.C,
+    3: ButtonInputs.D
+}
+
+
 # Enumerations for directional axes used by the input system
 class AxisInputs(Enum):
     X_LEFT = auto()

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pygame
-from AA_utils import settings, timer, inputManager
+from AA_utils import settings, timer, inputManager, musicManager
 from typing import List, Optional
 
 
@@ -10,7 +10,8 @@ from typing import List, Optional
 class Scene:
 
     def __init__(self, mainApp: pygame.Surface,
-                 inputManager: inputManager.InputManager):
+                 inputManager: inputManager.InputManager,
+                 musicManager: musicManager.MusicManager):
         # Reference to the main drawing surface (window / screen)
         self._mainApp = mainApp
 
@@ -20,6 +21,8 @@ class Scene:
         self._stateTimer = timer.Timer()
         # Shared input manager instance (keyboard / joystick abstraction)
         self._inputManager = inputManager
+        # Shared input manager instance (audio abstraction)
+        self._musicManager = musicManager
 
     def initScene(self):
         # Called once when the scene becomes active — reset internal timer.
