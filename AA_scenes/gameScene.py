@@ -103,6 +103,7 @@ class GameScene(sceneClass.Scene):
 
         for txt in currentText:
             self._mainApp.blit(txt.text, txt.position)
+
         return super().loopScene(events)
 
     def getTransition(self):

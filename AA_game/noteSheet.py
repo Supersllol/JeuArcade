@@ -1,6 +1,6 @@
 import pygame
 from typing import List
-from AA_utils import misc, settings, timer, inputManager
+from AA_utils import misc, settings, timer, fontManager, inputManager
 from AA_game import musicTrack
 
 noteColors = {
@@ -36,11 +36,18 @@ class NoteIndicator:
         ) >= settings.TIME_ACTIVE_NOTE_INDICATOR:
             self._active = False
             self._activeTimer.stop()
+        currentColor = "red" if self._active else "#AAAAAA"
+        buttonIndicator = fontManager.upheaval(
+            inputManager.moveBindings[self._laneID].name, 25, currentColor)
+        self._mainSheet.blit(
+            buttonIndicator,
+            buttonIndicator.get_rect(center=(self._coords[0],
+                                             self._coords[1] - 3)))
         misc.pixel_ring(self._mainSheet,
-                        "red" if self._active else "white",
+                        currentColor,
                         self._coords,
                         settings.NOTE_RADIUS,
-                        thickness=3)
+                        thickness=2)
 
 
 class NoteSheet:
@@ -57,13 +64,17 @@ class NoteSheet:
 
     def _drawNotes(self, noteSection: musicTrack.TrackSection,
                    musicElapsedTime: float):
-        # for lane in noteSection.lanes:
-        #     for note in lane.notes:
-        note = noteSection.lanes[3].notes[0]
-        calculatedYPos = settings.HIT_HEIGHT - (
-            (note.timestamp - musicElapsedTime) * settings.NOTE_SPEED)
-        pygame.draw.circle(self._mainSheet, "blue", (getLaneCenterXPos(
-            self._mainSheet.get_width(), 3), calculatedYPos), 10)
+        for lane in noteSection.lanes:
+            for note in lane.notes:
+                calculatedYPos = settings.HIT_HEIGHT - (
+                    (note.timestamp - musicElapsedTime) * settings.NOTE_SPEED)
+                misc.pixel_ring(
+                    self._mainSheet,
+                    noteColors[lane.laneID],
+                    (getLaneCenterXPos(self._mainSheet.get_width(),
+                                       lane.laneID), calculatedYPos),
+                    settings.NOTE_RADIUS,
+                    thickness=0)
 
     def update(self, noteSection: musicTrack.TrackSection,
                musicElapsedTime: float):
