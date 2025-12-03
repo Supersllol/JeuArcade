@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pygame
 from AA.AA_scenes import gameScene
 from AA.AA_utils import inputManager, musicManager, countries, settings

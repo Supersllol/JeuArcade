@@ -2,7 +2,6 @@ from __future__ import annotations
 from AA.AA_scenes import sceneClass
 from AA.AA_utils import fontManager, inputManager, pygameText, musicManager, settings
 from AA.AA_game import musicTrack, player
-from typing import List
 from enum import Enum, auto
 import pygame, os
 
@@ -43,14 +42,15 @@ class GameScene(sceneClass.Scene):
         self._state = GameState.INITIAL_DELAY
         super().initScene()
 
-    def loopScene(self, events: List[pygame.event.Event]):
-        print(self._musicManager.getMusicElapsedSeconds())
+    def loopScene(self, events: list[pygame.event.Event]):
+        currentMusicElapsed = self._musicManager.getMusicElapsedSeconds()
+        print(currentMusicElapsed)
         self._mainApp.fill((0, 0, 0))
         self._mainApp.blit(
             self._bgImage,
             self._bgImage.get_rect(center=self._mainApp.get_rect().center))
 
-        currentText: List[pygameText.PygameText] = []
+        currentText: list[pygameText.PygameText] = []
 
         if self._state == GameState.INITIAL_DELAY:
             if self._stateTimer.elapsed() >= settings.START_DELAY:
@@ -84,23 +84,20 @@ class GameScene(sceneClass.Scene):
         elif self._state == GameState.PLAY_SECTION:
 
             if not self._fadeOutStarted and (
-                    self._musicManager.getMusicElapsedSeconds()
-                    >= (self._chosenTrack.getSection(
+                    currentMusicElapsed >= (self._chosenTrack.getSection(
                         self._currentTrackSection).musicEnd -
-                        settings.FADE_TIME_S)):
+                                            settings.FADE_TIME_S)):
                 self._fadeOutStarted = True
                 self._musicManager.fadeout(settings.FADE_TIME_S * 1000)
 
-            if self._musicManager.isSongOver(
-            ) or self._musicManager.getMusicElapsedSeconds(
-            ) >= self._chosenTrack.getSection(
+            if currentMusicElapsed >= self._chosenTrack.getSection(
                     self._currentTrackSection).musicEnd:
                 self._musicManager.stop()
                 self._fadeOutStarted = False
                 self._state = GameState.WAIT_FOR_ATTACK
 
         for player in self._players:
-            player.update(self._musicManager.getMusicElapsedSeconds())
+            player.update(currentMusicElapsed)
 
         for txt in currentText:
             self._mainApp.blit(txt.text, txt.position)

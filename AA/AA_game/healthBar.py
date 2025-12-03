@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pygame
 from AA.AA_utils import misc
 

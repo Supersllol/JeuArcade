@@ -1,6 +1,7 @@
-import pygame
+from __future__ import annotations
+
+import pygame, os
 from AA.AA_utils import settings
-import os
 
 
 def upheaval(text: str, size: int, color: str | tuple[int, int, int]):

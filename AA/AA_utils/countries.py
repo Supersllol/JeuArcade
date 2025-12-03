@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 import pygame, os, random
 # from AA_utils import settings
