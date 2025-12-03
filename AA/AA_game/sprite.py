@@ -1,7 +1,7 @@
 import pygame
 from enum import Enum
-from AA_utils import misc, settings
-from AA_game import healthBar
+from AA.AA_utils import misc, settings
+from AA.AA_game import healthBar
 import os
 
 

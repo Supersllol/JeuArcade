@@ -1,8 +1,8 @@
 from __future__ import annotations
-from AA_scenes import sceneClass
-from AA_utils import settings, inputManager, fontManager, musicManager, pygameText
-from AA_game import player, musicTrack
-from typing import List, Optional
+from AA.AA_scenes import sceneClass
+from AA.AA_utils import fontManager, inputManager, pygameText, musicManager, settings
+from AA.AA_game import musicTrack, player
+from typing import List
 from enum import Enum, auto
 import pygame, os
 

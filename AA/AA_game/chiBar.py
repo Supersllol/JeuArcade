@@ -1,5 +1,5 @@
 import pygame
-from AA_utils import misc, fontManager
+from AA.AA_utils import fontManager, misc
 
 
 class ChiBar:

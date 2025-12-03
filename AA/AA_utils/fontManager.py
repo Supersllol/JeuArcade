@@ -1,5 +1,5 @@
 import pygame
-from AA_utils import settings
+from AA.AA_utils import settings
 import os
 
 

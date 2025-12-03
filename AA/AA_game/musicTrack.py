@@ -1,5 +1,5 @@
 import json, math, os
-from AA_utils import musicManager, settings, timer, inputManager
+from AA.AA_utils import settings
 from enum import Enum
 from typing import List
 

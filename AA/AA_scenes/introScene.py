@@ -1,10 +1,5 @@
 from __future__ import annotations
 
-from AA_scenes import sceneClass, homeScene
-from AA_utils import inputManager
-import pygame
-from typing import List, Optional
-
 # class IntroScene(sceneClass.Scene):
 
 #     def __init__(self, mainApp: pygame.Surface,

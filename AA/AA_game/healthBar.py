@@ -1,5 +1,5 @@
 import pygame
-from AA_utils import misc
+from AA.AA_utils import misc
 
 
 class HealthBar:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pygame
-from AA_utils import settings, timer, inputManager, musicManager
+from AA.AA_utils import timer, inputManager, musicManager
 from typing import List, Optional
 
 

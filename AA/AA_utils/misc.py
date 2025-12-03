@@ -1,6 +1,6 @@
 import math
 import pygame
-from AA_utils import settings
+from AA.AA_utils import settings
 
 
 def placeSurfaceInHalf(playerID: int,

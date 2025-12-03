@@ -1,6 +1,6 @@
-import pygame, json
-from AA_utils import fontManager, musicManager, countries
-from AA_game import noteSheet, healthBar, chiBar, sprite, musicTrack
+import pygame
+from AA.AA_utils import countries
+from AA.AA_game import noteSheet, musicTrack, sprite, chiBar
 
 
 class Player:

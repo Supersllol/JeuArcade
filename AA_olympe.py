@@ -1,7 +1,7 @@
 import pygame
-from AA_scenes import introScene, gameScene
-from AA_utils import settings, inputManager, countries, musicManager
-from AA_game import musicTrack, player
+from AA.AA_scenes import gameScene
+from AA.AA_utils import inputManager, musicManager, countries, settings
+from AA.AA_game import musicTrack, player
 
 
 def main():
