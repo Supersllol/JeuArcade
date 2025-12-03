@@ -91,7 +91,8 @@ class GameScene(sceneClass.Scene):
                 self._fadeOutStarted = True
                 self._musicManager.fadeout(settings.FADE_TIME_S * 1000)
 
-            if self._musicManager.getMusicElapsedSeconds(
+            if self._musicManager.isSongOver(
+            ) or self._musicManager.getMusicElapsedSeconds(
             ) >= self._chosenTrack.getSection(
                     self._currentTrackSection).musicEnd:
                 self._musicManager.stop()

@@ -68,6 +68,8 @@ class NoteSheet:
             for note in lane.notes:
                 calculatedYPos = settings.HIT_HEIGHT - (
                     (note.timestamp - musicElapsedTime) * settings.NOTE_SPEED)
+                if calculatedYPos < (0 - settings.NOTE_RADIUS):
+                    break
                 misc.pixel_ring(
                     self._mainSheet,
                     noteColors[lane.laneID],
