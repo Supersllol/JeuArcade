@@ -21,6 +21,14 @@ class TrackNote:
     def timestamp(self):
         return self._timestamp
 
+    @property
+    def active(self):
+        return self._active
+
+    @active.setter
+    def active(self, newVal: bool):
+        self._active = newVal
+
     def __str__(self):
         return f"Note: timestamp: {self.timestamp}"
 

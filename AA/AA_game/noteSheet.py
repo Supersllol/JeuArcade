@@ -1,6 +1,7 @@
 import pygame
-from AA.AA_utils import timer, fontManager, inputManager, misc, settings
-from AA.AA_game import musicTrack
+from typing import List
+from AA_utils import misc, settings, timer, fontManager, inputManager
+from AA_game import musicTrack
 
 noteColors = {
     0: (213, 0, 0),
@@ -66,7 +67,9 @@ class NoteSheet:
         for lane in noteSection.lanes:
             for note in lane.notes:
                 calculatedYPos = settings.HIT_HEIGHT - (
-                        (note.timestamp - musicElapsedTime) * settings.NOTE_SPEED)
+                    (note.timestamp - musicElapsedTime) * settings.NOTE_SPEED)
+                if calculatedYPos < (0 - settings.NOTE_RADIUS):
+                    break
                 misc.pixel_ring(
                     self._mainSheet,
                     noteColors[lane.laneID],
