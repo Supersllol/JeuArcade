@@ -1,7 +1,7 @@
 import pygame
 from typing import List
-from AA_utils import misc, settings, timer, fontManager, inputManager
-from AA_game import musicTrack
+from AA.AA_utils import misc, settings, timer, fontManager, inputManager
+from AA.AA_game import musicTrack
 
 noteColors = {
     0: (213, 0, 0),
