@@ -6,27 +6,49 @@ from AA.AA_utils import misc, settings, timer, fontManager, inputManager
 from AA.AA_game import musicTrack
 
 noteColors = {
-    0: (213, 0, 0),
-    1: (0, 28, 218),
-    2: (0, 211, 43),
-    3: (255, 240, 0)
+    0: [213, 0, 0, 255],
+    1: [0, 28, 218, 255],
+    2: [0, 211, 43, 255],
+    3: [255, 240, 0, 255]
 }
 
 
-def getLaneCenterXPos(sheetWidth: int, laneID: int):
-    xGap = (sheetWidth - settings.NOTE_RADIUS * 8) / 5
-    return (xGap + settings.NOTE_RADIUS +
-            (xGap + settings.NOTE_RADIUS * 2) * laneID)
+class DeactivatedNote:
+
+    def __init__(self, missed: bool, note: musicTrack.TrackNote, laneID: int):
+        self._baseNote = note
+        self._missed = missed
+        self._laneID = laneID
+        self._timer = timer.Timer()
+        self._timer.restart()
+
+    def isNoteAlive(self):
+        return self._timer.elapsed() < settings.DEAD_NOTE_FADEOUT
+
+    def getNoteColor(self):
+        baseColor = noteColors[self._laneID].copy() if self._missed else [
+            255, 255, 255, 255
+        ]
+
+        transparency = max(
+            0 + (255 * ((settings.DEAD_NOTE_FADEOUT - self._timer.elapsed()) /
+                        settings.DEAD_NOTE_FADEOUT)), 0)
+        baseColor[3] = int(transparency)
+        return baseColor
+
+    @property
+    def baseNote(self):
+        return self._baseNote
 
 
 class NoteIndicator:
 
-    def __init__(self, mainSheet: pygame.Surface, laneID: int):
+    def __init__(self, mainSheet: pygame.Surface, laneID: int,
+                 coords: tuple[int, int]):
         self._active = False
         self._mainSheet = mainSheet
         self._laneID = laneID
-        self._coords = (getLaneCenterXPos(mainSheet.get_width(),
-                                          laneID), settings.HIT_HEIGHT)
+        self._coords = coords
         self._activeTimer = timer.Timer()
 
     def setActive(self):
@@ -59,32 +81,47 @@ class NoteSheet:
         self._playerHalf = playerHalf
 
         self._mainSheet = pygame.Surface((250, 684), pygame.SRCALPHA)
+        self._deactivatedNotes: list[DeactivatedNote] = []
 
         self._noteIndicators = [
-            NoteIndicator(self._mainSheet, i) for i in range(4)
+            NoteIndicator(
+                self._mainSheet, i,
+                (self.getLaneCenterXPos(i), settings.NOTE_HIT_HEIGHT))
+            for i in range(4)
         ]
 
-    def _drawNotes(self, noteSection: musicTrack.TrackSection,
-                   musicElapsedTime: float):
+    def _drawNotes(self, noteSection: musicTrack.TrackSection):
         for lane in noteSection.lanes:
-            for note in lane.notes:
-                calculatedYPos = settings.HIT_HEIGHT - (
-                    (note.timestamp - musicElapsedTime) * settings.NOTE_SPEED)
-                if calculatedYPos < (0 - settings.NOTE_RADIUS):
-                    break
-                misc.pixel_ring(
-                    self._mainSheet,
-                    noteColors[lane.laneID],
-                    (getLaneCenterXPos(self._mainSheet.get_width(),
-                                       lane.laneID), calculatedYPos),
-                    settings.NOTE_RADIUS,
-                    thickness=0)
+            for note in lane.activeNotes:
+                misc.pixel_ring(self._mainSheet,
+                                noteColors[lane.laneID],
+                                note.sheetPos,
+                                settings.NOTE_RADIUS,
+                                thickness=0)
 
-    def update(self, noteSection: musicTrack.TrackSection,
-               musicElapsedTime: float):
+        for deactivatedNote in self._deactivatedNotes:
+            misc.pixel_ring(self._mainSheet,
+                            deactivatedNote.getNoteColor(),
+                            deactivatedNote.baseNote.sheetPos,
+                            settings.NOTE_RADIUS,
+                            thickness=0)
+
+    def getLaneCenterXPos(self, laneID: int):
+        xGap = (self._mainSheet.get_width() - settings.NOTE_RADIUS * 8) / 5
+        return int((xGap + settings.NOTE_RADIUS +
+                    (xGap + settings.NOTE_RADIUS * 2) * laneID))
+
+    def deactivateNote(self, missed: bool, note: musicTrack.TrackNote,
+                       laneID: int):
+        self._deactivatedNotes.append(DeactivatedNote(missed, note, laneID))
+
+    def update(self, noteSection: musicTrack.TrackSection):
         self._mainSheet.fill((0, 0, 0, 100))
+        for id, deactivatedNote in enumerate(self._deactivatedNotes):
+            if not deactivatedNote.isNoteAlive():
+                self._deactivatedNotes.pop(id)
 
-        self._drawNotes(noteSection, musicElapsedTime)
+        self._drawNotes(noteSection)
 
         for noteIndicator in self._noteIndicators:
             noteIndicator.update()

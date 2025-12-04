@@ -26,3 +26,6 @@ class MusicManager:
 
     def prepareSection(self, startSeconds: float, prepareTime: float):
         self._musicTimer.setAndStart(startSeconds - prepareTime)
+
+    def isMusicRunning(self):
+        return self._musicTimer.isRunning()

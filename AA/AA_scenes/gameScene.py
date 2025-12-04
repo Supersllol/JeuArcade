@@ -3,7 +3,7 @@ from AA.AA_scenes import sceneClass
 from AA.AA_utils import fontManager, inputManager, pygameText, musicManager, settings
 from AA.AA_game import musicTrack, player
 from enum import Enum, auto
-import pygame, os
+import pygame, os, math
 
 
 class GameState(Enum):
@@ -43,8 +43,8 @@ class GameScene(sceneClass.Scene):
         super().initScene()
 
     def loopScene(self, events: list[pygame.event.Event]):
-        currentMusicElapsed = self._musicManager.getMusicElapsedSeconds()
-        print(currentMusicElapsed)
+        currentMusicElapsed = self._musicManager.getMusicElapsedSeconds(
+        ) if self._musicManager.isMusicRunning() else -math.inf
         self._mainApp.fill((0, 0, 0))
         self._mainApp.blit(
             self._bgImage,
@@ -53,7 +53,7 @@ class GameScene(sceneClass.Scene):
         currentText: list[pygameText.PygameText] = []
 
         if self._state == GameState.INITIAL_DELAY:
-            if self._stateTimer.elapsed() >= settings.START_DELAY:
+            if self._stateTimer.elapsed() >= settings.GAME_START_DELAY:
                 self._stateTimer.restart()
                 self._currentTrackSection = 0
                 self._musicManager.prepareSection(0, 3)
@@ -86,9 +86,9 @@ class GameScene(sceneClass.Scene):
             if not self._fadeOutStarted and (
                     currentMusicElapsed >= (self._chosenTrack.getSection(
                         self._currentTrackSection).musicEnd -
-                                            settings.FADE_TIME_S)):
+                                            settings.SONG_FADE_TIME_S)):
                 self._fadeOutStarted = True
-                self._musicManager.fadeout(settings.FADE_TIME_S * 1000)
+                self._musicManager.fadeout(settings.SONG_FADE_TIME_S * 1000)
 
             if currentMusicElapsed >= self._chosenTrack.getSection(
                     self._currentTrackSection).musicEnd:

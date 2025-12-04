@@ -5,6 +5,7 @@
 - [ ] Create enemy AI behavior
 - [ ] Design CHI progression system
 - [ ] Develop combat system
+- [ ] Combo?
 
 ## Art and Assets
 - [ ] Create animations

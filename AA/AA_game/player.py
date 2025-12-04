@@ -1,6 +1,6 @@
 from __future__ import annotations
 import pygame
-from AA.AA_utils import countries
+from AA.AA_utils import countries, settings, score
 from AA.AA_game import noteSheet, musicTrack, sprite, chiBar
 
 
@@ -31,12 +31,43 @@ class Player:
         self._sprite = sprite.Sprite(playerID, self._playerHalf)
 
     def loadSection(self, newSection: musicTrack.TrackSection):
+        newSection.queueAllNotes()
+        for lane in newSection.lanes:
+            for note in lane.queuedNotes:
+                note._appearTimestamp = note.timingTimestamp - (
+                    (settings.NOTE_HIT_HEIGHT + settings.NOTE_RADIUS) /
+                    settings.NOTE_SPEED)
         self._trackSection = newSection
+
+    def _registerNoteHit(self, hitType: score.HitType):
+        self._chi += score.hitChiScore[hitType]
+
+    def _updateNoteStatus(self, musicElapsedTime: float):
+        for lane in self._trackSection.lanes:
+            for note in lane.queuedNotes:
+                if musicElapsedTime >= note.appearTimestamp:
+                    lane.activateNote(lane.queuedNotes.pop(0))
+                else:
+                    break
+
+            for note in lane.activeNotes:
+                if musicElapsedTime - note.timingTimestamp >= settings.MISSED_NOTE_TIME:
+                    self._registerNoteHit(score.HitType.Miss)
+                    self._noteSheet.deactivateNote(True,
+                                                   lane.activeNotes.pop(0),
+                                                   lane.laneID)
+                calculatedYPos = settings.NOTE_HIT_HEIGHT - (
+                    (note.timingTimestamp - musicElapsedTime) *
+                    settings.NOTE_SPEED)
+                note.sheetPos = (self._noteSheet.getLaneCenterXPos(
+                    lane.laneID), calculatedYPos)
 
     def update(self, musicElapsedTime: float):
         self._playerHalf.fill((0, 0, 0, 0))
 
-        self._noteSheet.update(self._trackSection, musicElapsedTime)
+        self._updateNoteStatus(musicElapsedTime)
+
+        self._noteSheet.update(self._trackSection)
         self._chiBar.update(self._chi)
         self._sprite.update(self._health)
 

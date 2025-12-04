@@ -1,5 +1,5 @@
 from __future__ import annotations
-import json, math, os, pygame
+import json, os, pygame, math
 from AA.AA_utils import settings
 from enum import Enum
 
@@ -14,45 +14,64 @@ class GameTracks(Enum):
 class TrackNote:
 
     def __init__(self, timestamp: float):
-        self._timestamp = timestamp
-        self._active = False
+        self._timingTimestamp = timestamp
+        self._appearTimestamp = -math.inf
+        self._sheetPos = (0, 0)
 
     @property
-    def timestamp(self):
-        return self._timestamp
+    def timingTimestamp(self):
+        return self._timingTimestamp
 
     @property
-    def active(self):
-        return self._active
+    def appearTimestamp(self):
+        return self._appearTimestamp
 
-    @active.setter
-    def active(self, newVal: bool):
-        self._active = newVal
+    @property
+    def sheetPos(self):
+        return self._sheetPos
+
+    @sheetPos.setter
+    def sheetPos(self, newPos: tuple[float, float]):
+        self._sheetPos = newPos
 
     def __str__(self):
-        return f"Note: timestamp: {self.timestamp}"
+        return f"Note: timing timestamp: {self.timingTimestamp}, appear timestamp: {self.appearTimestamp}"
 
 
 class NoteLane:
 
     def __init__(self, notes: list[TrackNote], laneID: int):
-        self._notes = notes
+        self._queuedNotes = notes
+        self._activeNotes: list[TrackNote] = []
         self._laneID = laneID
 
     @property
-    def notes(self):
-        return self._notes
+    def queuedNotes(self):
+        return self._queuedNotes
+
+    @property
+    def activeNotes(self):
+        return self._activeNotes
 
     @property
     def laneID(self):
         return self._laneID
 
-    def addNote(self, note: TrackNote):
-        self._notes.append(note)
+    def queueNote(self, note: TrackNote):
+        self._queuedNotes.append(note)
+
+    def activateNote(self, note: TrackNote):
+        self._activeNotes.append(note)
+
+    def queueAllNotes(self):
+        self._queuedNotes.extend(self._activeNotes)
+        self._queuedNotes.sort(key=lambda e: e.timingTimestamp)
+        self._activeNotes = []
 
     def __str__(self):
-        notes = [str(note) + " " for note in self._notes]
-        return f"Lane {self._laneID}: {''.join(notes)}"
+        queuedNotes = [str(note) + " " for note in self._queuedNotes]
+        activeNotes = [str(note) + " " for note in self._activeNotes]
+        return f"Lane {self._laneID}: Queued notes: [{''.join(queuedNotes)}], Active notes: [{activeNotes}]"
 
 
 class TrackSection:
@@ -73,6 +92,10 @@ class TrackSection:
     @property
     def musicEnd(self):
         return self._musicEnd
+
+    def queueAllNotes(self):
+        for lane in self._lanes:
+            lane.queueAllNotes()
 
     def __str__(self):
         lanes = [str(lane) + "\n" for lane in self._lanes]
@@ -115,7 +138,7 @@ class TrackBeatMap:
             if time >= sectionEnd:
                 break
             newNote = TrackNote(time)
-            lanes[move].addNote(newNote)
+            lanes[move].queueNote(newNote)
 
         return TrackSection(lanes, sectionStart, sectionEnd)
 
