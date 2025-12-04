@@ -72,7 +72,7 @@ class GameScene(sceneClass.Scene):
                     txt = "2"
                 if self._stateTimer.elapsed() >= 2:
                     txt = "1"
-                txt = fontManager.upheaval(txt, 250, "white")
+                txt = fontManager.upheaval(txt, 250, (255, 255, 255))
 
                 currentText.append(
                     pygameText.PygameText(

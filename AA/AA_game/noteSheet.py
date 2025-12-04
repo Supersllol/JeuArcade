@@ -38,7 +38,7 @@ class NoteIndicator:
         ) >= settings.TIME_ACTIVE_NOTE_INDICATOR:
             self._active = False
             self._activeTimer.stop()
-        currentColor = "red" if self._active else "#AAAAAA"
+        currentColor = (189, 0, 0) if self._active else (165, 164, 164)
         buttonIndicator = fontManager.upheaval(
             inputManager.moveBindings[self._laneID].name, 25, currentColor)
         self._mainSheet.blit(
@@ -82,7 +82,7 @@ class NoteSheet:
 
     def update(self, noteSection: musicTrack.TrackSection,
                musicElapsedTime: float):
-        self._mainSheet.fill("#0000006E")
+        self._mainSheet.fill((0, 0, 0, 100))
 
         self._drawNotes(noteSection, musicElapsedTime)
 

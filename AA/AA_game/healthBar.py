@@ -40,7 +40,7 @@ class HealthBar:
                 (bar_height - rect_height) // 2,  # Center vertically too
                 rect_width,
                 rect_height)
-            pygame.draw.rect(self._bar, "#00E727", rect)
+            pygame.draw.rect(self._bar, (0, 255, 64), rect)
 
         # Optional: draw a border around the entire bar
         pygame.draw.rect(self._bar, (0, 0, 0), (0, 0, bar_width, bar_height),

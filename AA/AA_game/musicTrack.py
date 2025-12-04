@@ -83,7 +83,7 @@ class TrackBeatMap:
 
     def __init__(self, chosenTrack: GameTracks):
         self._audioFile = os.path.join(settings.PARENT_PATH,
-                                       f"AA_chansons/{chosenTrack.value}.wav")
+                                       f"AA_chansons/{chosenTrack.value}.mp3")
 
         self._songLength = pygame.mixer.Sound(self._audioFile).get_length()
 

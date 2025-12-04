@@ -9,13 +9,14 @@ class ChiBar:
         self._playerID = playerID
         self._playerHalf = playerHalf
 
-        self._txtChi = fontManager.upheaval("CHI", 26, "white")
+        self._txtChi = fontManager.upheaval("CHI", 26, (255, 255, 255))
         self._bar = pygame.Surface((300, 50), pygame.SRCALPHA)
 
     def update(self, currentChi: int):
-        self._bar.fill("#FFFFFF")
+        self._bar.fill((255, 255, 255))
 
-        txtCurrentChi = fontManager.upheaval(str(currentChi), 26, "white")
+        txtCurrentChi = fontManager.upheaval(str(currentChi), 26,
+                                             (255, 255, 255))
 
         misc.placeSurfaceInHalf(self._playerID, self._bar, self._playerHalf,
                                 (300, 702))
