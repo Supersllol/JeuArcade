@@ -6,6 +6,7 @@
 - [ ] Design CHI progression system
 - [ ] Develop combat system
 - [ ] Combo?
+- [ ] Display score per note
 
 ## Art and Assets
 - [ ] Create animations

@@ -1,19 +1,9 @@
 from __future__ import annotations
 from AA.AA_scenes import sceneClass
 from AA.AA_utils import fontManager, inputManager, pygameText, musicManager, settings
-from AA.AA_game import musicTrack, player
+from AA.AA_game import musicTrack, player, gameStates
 from enum import Enum, auto
 import pygame, os, math
-
-
-class GameState(Enum):
-    INITIAL_DELAY = auto()
-    START_COUNTDOWN = auto()
-    PLAY_SECTION = auto()
-    WAIT_FOR_ATTACK = auto()
-    FIGHT_SCENE = auto()
-    RESTART_COUNTDOWN = auto()
-    END = auto()
 
 
 class GameScene(sceneClass.Scene):
@@ -34,12 +24,14 @@ class GameScene(sceneClass.Scene):
 
         self._fadeOutStarted = False
 
-        self._state = GameState.INITIAL_DELAY
+        self._state = gameStates.GameState.INITIAL_DELAY
 
         super().__init__(mainApp, inputManager, musicManager)
 
     def initScene(self):
-        self._state = GameState.INITIAL_DELAY
+        self._state = gameStates.GameState.INITIAL_DELAY
+        for player in self._players:
+            player.loadSection(self._chosenTrack.getSection(0))
         super().initScene()
 
     def loopScene(self, events: list[pygame.event.Event]):
@@ -52,20 +44,20 @@ class GameScene(sceneClass.Scene):
 
         currentText: list[pygameText.PygameText] = []
 
-        if self._state == GameState.INITIAL_DELAY:
+        if self._state == gameStates.GameState.INITIAL_DELAY:
             if self._stateTimer.elapsed() >= settings.GAME_START_DELAY:
                 self._stateTimer.restart()
                 self._currentTrackSection = 0
                 self._musicManager.prepareSection(0, 3)
                 for player in self._players:
                     player.loadSection(self._chosenTrack.getSection(0))
-                self._state = GameState.START_COUNTDOWN
+                self._state = gameStates.GameState.START_COUNTDOWN
 
-        elif self._state == GameState.START_COUNTDOWN:
+        elif self._state == gameStates.GameState.START_COUNTDOWN:
             if self._stateTimer.elapsed() >= 3:
                 self._musicManager.play(self._chosenTrack.audioFile, 0)
                 self._fadeOutStarted = False
-                self._state = GameState.PLAY_SECTION
+                self._state = gameStates.GameState.PLAY_SECTION
             else:
                 txt = "3"
                 if self._stateTimer.elapsed() >= 1:
@@ -81,23 +73,24 @@ class GameScene(sceneClass.Scene):
                             center=(self._mainApp.get_rect().centerx,
                                     self._mainApp.get_rect().centery))))
 
-        elif self._state == GameState.PLAY_SECTION:
+        elif self._state == gameStates.GameState.PLAY_SECTION:
 
             if not self._fadeOutStarted and (
                     currentMusicElapsed >= (self._chosenTrack.getSection(
                         self._currentTrackSection).musicEnd -
                                             settings.SONG_FADE_TIME_S)):
                 self._fadeOutStarted = True
-                self._musicManager.fadeout(settings.SONG_FADE_TIME_S * 1000)
+                self._musicManager.fadeout(
+                    int(settings.SONG_FADE_TIME_S * 1000))
 
             if currentMusicElapsed >= self._chosenTrack.getSection(
                     self._currentTrackSection).musicEnd:
                 self._musicManager.stop()
                 self._fadeOutStarted = False
-                self._state = GameState.WAIT_FOR_ATTACK
+                self._state = gameStates.GameState.WAIT_FOR_ATTACK
 
         for player in self._players:
-            player.update(currentMusicElapsed)
+            player.update(currentMusicElapsed, self._state, self._inputManager)
 
         for txt in currentText:
             self._mainApp.blit(txt.text, txt.position)

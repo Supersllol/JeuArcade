@@ -6,11 +6,14 @@ from AA.AA_utils import misc, settings, timer, fontManager, inputManager
 from AA.AA_game import musicTrack
 
 noteColors = {
-    0: [213, 0, 0, 255],
-    1: [0, 28, 218, 255],
-    2: [0, 211, 43, 255],
-    3: [255, 240, 0, 255]
+    0: (213, 0, 0, 255),
+    1: (0, 28, 218, 255),
+    2: (0, 211, 43, 255),
+    3: (255, 240, 0, 255)
 }
+
+hittableYCoord = settings.NOTE_HIT_HEIGHT - settings.NOTE_RADIUS + settings.TIME_NOTE_HITTABLE * settings.NOTE_SPEED
+print(hittableYCoord)
 
 
 class DeactivatedNote:
@@ -26,7 +29,7 @@ class DeactivatedNote:
         return self._timer.elapsed() < settings.DEAD_NOTE_FADEOUT
 
     def getNoteColor(self):
-        baseColor = noteColors[self._laneID].copy() if self._missed else [
+        baseColor = list(noteColors[self._laneID]) if self._missed else [
             255, 255, 255, 255
         ]
 
@@ -57,10 +60,10 @@ class NoteIndicator:
 
     def update(self):
         if self._active and self._activeTimer.elapsed(
-        ) >= settings.TIME_ACTIVE_NOTE_INDICATOR:
+        ) >= settings.NOTE_INDICATOR_TIME_ACTIVE:
             self._active = False
             self._activeTimer.stop()
-        currentColor = (189, 0, 0) if self._active else (165, 164, 164)
+        currentColor = (255, 255, 255) if self._active else (165, 164, 164)
         buttonIndicator = fontManager.upheaval(
             inputManager.moveBindings[self._laneID].name, 25, currentColor)
         self._mainSheet.blit(
@@ -111,12 +114,18 @@ class NoteSheet:
         return int((xGap + settings.NOTE_RADIUS +
                     (xGap + settings.NOTE_RADIUS * 2) * laneID))
 
-    def deactivateNote(self, missed: bool, note: musicTrack.TrackNote,
-                       laneID: int):
+    def deactivateNote(self,
+                       note: musicTrack.TrackNote,
+                       laneID: int,
+                       missed: bool = False):
         self._deactivatedNotes.append(DeactivatedNote(missed, note, laneID))
+
+    def laneBtnPressed(self, laneID: int):
+        self._noteIndicators[laneID].setActive()
 
     def update(self, noteSection: musicTrack.TrackSection):
         self._mainSheet.fill((0, 0, 0, 100))
+
         for id, deactivatedNote in enumerate(self._deactivatedNotes):
             if not deactivatedNote.isNoteAlive():
                 self._deactivatedNotes.pop(id)
@@ -125,6 +134,9 @@ class NoteSheet:
 
         for noteIndicator in self._noteIndicators:
             noteIndicator.update()
+
+        pygame.draw.line(self._mainSheet, (255, 255, 255), (0, hittableYCoord),
+                         (self._mainSheet.get_width(), hittableYCoord), 3)
 
         misc.placeSurfaceInHalf(self._playerID, self._mainSheet,
                                 self._playerHalf, (365, 0))

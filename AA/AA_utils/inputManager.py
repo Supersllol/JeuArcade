@@ -19,10 +19,10 @@ class ButtonInputs(Enum):
 
 
 moveBindings = {
-    0: ButtonInputs.A,
-    1: ButtonInputs.B,
-    2: ButtonInputs.C,
-    3: ButtonInputs.D
+    0: ButtonInputs.B,
+    1: ButtonInputs.L1,
+    2: ButtonInputs.R1,
+    3: ButtonInputs.L2
 }
 
 
@@ -42,11 +42,13 @@ class InputManager:
 
     # Default keyboard mappings for two players. Keys map to ButtonInputs or AxisInputs.
     _playerKeyboards = ({
-        ButtonInputs.A: pygame.K_u,
-        ButtonInputs.B: pygame.K_j,
-        ButtonInputs.D: pygame.K_k,
+        ButtonInputs.A: pygame.K_y,
+        ButtonInputs.B: pygame.K_h,
+        ButtonInputs.C: pygame.K_u,
+        ButtonInputs.D: pygame.K_j,
         ButtonInputs.L1: pygame.K_LEFT,
         ButtonInputs.R1: pygame.K_RIGHT,
+        ButtonInputs.L2: pygame.K_k,
         ButtonInputs.R2: pygame.K_i,
         ButtonInputs.START: pygame.K_o,
         ButtonInputs.SELECT: pygame.K_p,
@@ -56,17 +58,19 @@ class InputManager:
         AxisInputs.Y_DOWN: pygame.K_DOWN,
     }, {
         ButtonInputs.A: pygame.K_q,
-        ButtonInputs.B: pygame.K_z,
-        ButtonInputs.D: pygame.K_x,
-        ButtonInputs.L1: pygame.K_a,
-        ButtonInputs.R1: pygame.K_d,
+        ButtonInputs.B: pygame.K_a,
+        ButtonInputs.C: pygame.K_w,
+        ButtonInputs.D: pygame.K_s,
+        ButtonInputs.L1: pygame.K_c,
+        ButtonInputs.R1: pygame.K_b,
+        ButtonInputs.L2: pygame.K_d,
         ButtonInputs.R2: pygame.K_e,
         ButtonInputs.START: pygame.K_r,
         ButtonInputs.SELECT: pygame.K_t,
-        AxisInputs.X_LEFT: pygame.K_a,
-        AxisInputs.X_RIGHT: pygame.K_d,
-        AxisInputs.Y_UP: pygame.K_w,
-        AxisInputs.Y_DOWN: pygame.K_s,
+        AxisInputs.X_LEFT: pygame.K_c,
+        AxisInputs.X_RIGHT: pygame.K_b,
+        AxisInputs.Y_UP: pygame.K_f,
+        AxisInputs.Y_DOWN: pygame.K_v,
     })
 
     def __init__(self, joysticks: list[pygame.joystick.JoystickType]):

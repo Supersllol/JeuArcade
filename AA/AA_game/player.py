@@ -1,7 +1,7 @@
 from __future__ import annotations
 import pygame
-from AA.AA_utils import countries, settings, score
-from AA.AA_game import noteSheet, musicTrack, sprite, chiBar
+from AA.AA_utils import countries, settings, score, inputManager
+from AA.AA_game import noteSheet, musicTrack, sprite, chiBar, gameStates
 
 
 class Player:
@@ -14,7 +14,7 @@ class Player:
                  cpu: bool = False):
         self._name = name
         self._country = country
-        self._chi = 70000
+        self._chi = 0
         self._health = 10
         self._playerID = playerID
         self._mainApp = mainApp
@@ -30,6 +30,14 @@ class Player:
         self._chiBar = chiBar.ChiBar(playerID, self._playerHalf)
         self._sprite = sprite.Sprite(playerID, self._playerHalf)
 
+    @property
+    def chi(self):
+        return self._chi
+
+    @chi.setter
+    def chi(self, newValue: int):
+        self._chi = max(newValue, 0)
+
     def loadSection(self, newSection: musicTrack.TrackSection):
         newSection.queueAllNotes()
         for lane in newSection.lanes:
@@ -40,7 +48,22 @@ class Player:
         self._trackSection = newSection
 
     def _registerNoteHit(self, hitType: score.HitType):
-        self._chi += score.hitChiScore[hitType]
+        print(hitType)
+        self.chi += score.hitChiScore[hitType]
+
+    def _userHitNote(self, btnPressed: inputManager.ButtonInputs,
+                     musicElapsedTime: float):
+        for lane in self._trackSection.lanes:
+            if inputManager.moveBindings[lane.laneID] == btnPressed:
+                # TODO: animate player
+                self._noteSheet.laneBtnPressed(lane.laneID)
+                if len(lane.activeNotes) == 0: return
+                closestNote = lane.activeNotes[0]
+                deltaTime = musicElapsedTime - closestNote.timingTimestamp
+                if deltaTime >= settings.TIME_NOTE_HITTABLE:
+                    self._registerNoteHit(score.getHitType(deltaTime))
+                    self._noteSheet.deactivateNote(lane.activeNotes.pop(0),
+                                                   lane.laneID)
 
     def _updateNoteStatus(self, musicElapsedTime: float):
         for lane in self._trackSection.lanes:
@@ -51,19 +74,26 @@ class Player:
                     break
 
             for note in lane.activeNotes:
-                if musicElapsedTime - note.timingTimestamp >= settings.MISSED_NOTE_TIME:
+                if score.getHitType(musicElapsedTime - note.timingTimestamp,
+                                    False) == score.HitType.Miss:
                     self._registerNoteHit(score.HitType.Miss)
-                    self._noteSheet.deactivateNote(True,
-                                                   lane.activeNotes.pop(0),
-                                                   lane.laneID)
+                    self._noteSheet.deactivateNote(lane.activeNotes.pop(0),
+                                                   lane.laneID, True)
                 calculatedYPos = settings.NOTE_HIT_HEIGHT - (
                     (note.timingTimestamp - musicElapsedTime) *
                     settings.NOTE_SPEED)
                 note.sheetPos = (self._noteSheet.getLaneCenterXPos(
                     lane.laneID), calculatedYPos)
 
-    def update(self, musicElapsedTime: float):
+    def update(self, musicElapsedTime: float, gameState: gameStates.GameState,
+               input: inputManager.InputManager):
         self._playerHalf.fill((0, 0, 0, 0))
+
+        btnsPressed = input.getBtnsPressed(self._playerID)
+        for btn in btnsPressed:
+            if gameState in gameStates.statesAllowMoves:
+                if btn in inputManager.moveBindings.values():
+                    self._userHitNote(btn, musicElapsedTime)
 
         self._updateNoteStatus(musicElapsedTime)
 

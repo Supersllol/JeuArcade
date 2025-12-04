@@ -37,12 +37,12 @@ class Scene:
             if inputManager.ButtonInputs.SELECT in newPresses:
                 return False
             # Debug: print any new button presses
-            if newPresses: print(f"{i} : {newPresses}")
+            # if newPresses: print(f"{i} : {newPresses}")
 
         for i in range(2):
             newAxes = self._inputManager.getAxesActive(i)
             # Debug: print any newly active axes
-            if newAxes: print(f"{i} : {newAxes}")
+            # if newAxes: print(f"{i} : {newAxes}")
 
         # Update input manager snapshot AFTER processing inputs so that
         # getBtnsPressed/getAxesActive detect rising edges relative to the
