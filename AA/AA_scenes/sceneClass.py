@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pygame
+
 from AA.AA_utils import timer, inputManager, musicManager
 
 
@@ -53,6 +54,27 @@ class Scene:
     def getTransition(self) -> Scene | None:
         # Override in subclasses to return the next scene when finished.
         return None
+
+    def fadeinScene(self, startime: float = 0.0):
+        # Fade-in effect when scene starts
+        self._stateTimer.start()
+        blackmask = pygame.Surface(self._mainApp.get_size())
+        blackmask = blackmask.convert()
+        alpha = 255 - min(255, int((self._stateTimer.elapsed()) * 255))
+        blackmask.fill((0, 0, 0))
+        blackmask.set_alpha(alpha)
+        self._mainApp.blit(blackmask, (0, 0))
+
+    def fadeoutScene(self):
+        # Fade-out effect when scene ends
+        self._stateTimer.start()
+        blackmask = pygame.Surface(self._mainApp.get_size())
+        blackmask = blackmask.convert()
+        alpha = min(255, int((self._stateTimer.elapsed()) * 255))
+        print(self._stateTimer.elapsed())
+        blackmask.fill((0, 0, 0))
+        blackmask.set_alpha(alpha)
+        self._mainApp.blit(blackmask, (0, 0))
 
     @property
     def finished(self):
