@@ -1,8 +1,8 @@
-import pygame
+from __future__ import annotations
+import pygame, os
 from enum import Enum
 from AA.AA_utils import misc, settings
 from AA.AA_game import healthBar
-import os
 
 
 class Frame:

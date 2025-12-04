@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pygame
 from AA.AA_utils import timer, inputManager, musicManager
-from typing import List, Optional
 
 
 # Base class representing a game scene/state.
@@ -28,7 +27,7 @@ class Scene:
         # Called once when the scene becomes active — reset internal timer.
         self._stateTimer.restart()
 
-    def loopScene(self, events: List[pygame.event.Event]):
+    def loopScene(self, events: list[pygame.event.Event]):
         # Parent loop. Should be called after the child loop to update the button
         # states and check if user requested to exit program. Children loop should only
         # return whatever value this parent loop returns.
@@ -51,7 +50,7 @@ class Scene:
         self._inputManager.update()
         return True
 
-    def getTransition(self) -> Optional[Scene]:
+    def getTransition(self) -> Scene | None:
         # Override in subclasses to return the next scene when finished.
         return None
 

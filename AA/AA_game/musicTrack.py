@@ -1,7 +1,7 @@
-import json, math, os
+from __future__ import annotations
+import json, math, os, pygame
 from AA.AA_utils import settings
 from enum import Enum
-from typing import List
 
 
 class GameTracks(Enum):
@@ -35,7 +35,7 @@ class TrackNote:
 
 class NoteLane:
 
-    def __init__(self, notes: List[TrackNote], laneID: int):
+    def __init__(self, notes: list[TrackNote], laneID: int):
         self._notes = notes
         self._laneID = laneID
 
@@ -85,6 +85,8 @@ class TrackBeatMap:
         self._audioFile = os.path.join(settings.PARENT_PATH,
                                        f"AA_chansons/{chosenTrack.value}.wav")
 
+        self._songLength = pygame.mixer.Sound(self._audioFile).get_length()
+
         with open(os.path.join(settings.PARENT_PATH,
                                f"AA_chansons/beat-{chosenTrack.value}.json"),
                   "r",
@@ -101,7 +103,7 @@ class TrackBeatMap:
         else:
             sectionStart = sectionStart["start"]
         if sectionEnd == -1:
-            sectionEnd = math.inf
+            sectionEnd = self._songLength
         else:
             sectionEnd = sectionEnd["start"]
 

@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import pygame
-from typing import Optional, List
 from enum import Enum, auto
 
 
@@ -68,7 +69,7 @@ class InputManager:
         AxisInputs.Y_DOWN: pygame.K_s,
     })
 
-    def __init__(self, joysticks: List[pygame.joystick.JoystickType]):
+    def __init__(self, joysticks: list[pygame.joystick.JoystickType]):
         # store connected joysticks for use as controller input
         self._joysticks = joysticks
 

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import pygame
-from typing import List
+
 from AA.AA_utils import misc, settings, timer, fontManager, inputManager
 from AA.AA_game import musicTrack
 

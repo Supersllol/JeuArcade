@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pygame
 from AA.AA_utils import countries
 from AA.AA_game import noteSheet, musicTrack, sprite, chiBar
@@ -31,7 +32,6 @@ class Player:
 
     def loadSection(self, newSection: musicTrack.TrackSection):
         self._trackSection = newSection
-        print(newSection)
 
     def update(self, musicElapsedTime: float):
         self._playerHalf.fill((0, 0, 0, 0))

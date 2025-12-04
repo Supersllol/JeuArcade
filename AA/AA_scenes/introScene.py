@@ -9,7 +9,7 @@ from __future__ import annotations
 #     def initScene(self):
 #         super().initScene()
 
-#     def loopScene(self, events: List[pygame.event.Event]):
+#     def loopScene(self, events: list[pygame.event.Event]):
 #         self._mainApp.fill((255, 255, 255))
 
 #         # if joysticks[0].get_button(1):
