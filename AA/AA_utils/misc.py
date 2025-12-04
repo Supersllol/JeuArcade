@@ -82,3 +82,17 @@ def pixel_ring(surface, color, center, radius, pixel_size=3, thickness=3):
     blit_x = int(center[0] - radius)
     blit_y = int(center[1] - radius)
     surface.blit(pixelated, (blit_x, blit_y))
+
+
+def rescaleSurface(surface: pygame.Surface, fixedCoords: tuple[None | float,
+                                                               None | float]):
+    width, height = surface.get_width(), surface.get_height()
+    desiredWidth, desiredHeight = fixedCoords
+    originalRatio = width / height
+    if desiredWidth:
+        return pygame.transform.smoothscale(
+            surface, (desiredWidth, desiredWidth / originalRatio))
+    if desiredHeight:
+        return pygame.transform.smoothscale(
+            surface, (desiredHeight, desiredHeight * originalRatio))
+    return pygame.Surface((0, 0))

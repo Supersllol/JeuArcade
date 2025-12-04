@@ -8,7 +8,7 @@ class Player:
 
     def __init__(self,
                  name: str,
-                 country: countries.CountryFlags,
+                 country: countries.CountryOptions,
                  playerID: int,
                  mainApp: pygame.Surface,
                  cpu: bool = False):
@@ -28,7 +28,7 @@ class Player:
 
         self._noteSheet = noteSheet.NoteSheet(playerID, self._playerHalf)
         self._chiBar = chiBar.ChiBar(playerID, self._playerHalf)
-        self._sprite = sprite.Sprite(playerID, self._playerHalf)
+        self._sprite = sprite.Sprite(playerID, name, country, self._playerHalf)
 
     @property
     def chi(self):
@@ -48,7 +48,6 @@ class Player:
         self._trackSection = newSection
 
     def _registerNoteHit(self, hitType: score.HitType):
-        print(hitType)
         self.chi += score.hitChiScore[hitType]
 
     def _userHitNote(self, btnPressed: inputManager.ButtonInputs,
@@ -75,8 +74,8 @@ class Player:
 
             for note in lane.activeNotes:
                 if score.getHitType(musicElapsedTime - note.timingTimestamp,
-                                    False) == score.HitType.Miss:
-                    self._registerNoteHit(score.HitType.Miss)
+                                    False) == score.HitType.Manqué:
+                    self._registerNoteHit(score.HitType.Manqué)
                     self._noteSheet.deactivateNote(lane.activeNotes.pop(0),
                                                    lane.laneID, True)
                 calculatedYPos = settings.NOTE_HIT_HEIGHT - (

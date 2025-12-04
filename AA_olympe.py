@@ -28,8 +28,8 @@ def main():
 
     # currentScene = introScene.IntroScene(mainApp, input)
     # currentScene = homeScene.HomeScene(mainApp, input, music)
-    player0 = player.Player("SIM", countries.CountryFlags.Québec, 0, mainApp)
-    player1 = player.Player("MIS", countries.CountryFlags.Canada, 1, mainApp)
+    player0 = player.Player("SIM", countries.CountryOptions.PNG, 0, mainApp)
+    player1 = player.Player("MIS", countries.CountryOptions.CAN, 1, mainApp)
     currentScene = gameScene.GameScene(mainApp, input, music,
                                        musicTrack.GameTracks.SEMI_CHARMED_LIFE,
                                        (player0, player1))

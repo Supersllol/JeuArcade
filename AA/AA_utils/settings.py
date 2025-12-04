@@ -7,6 +7,8 @@ WINDOW_SIZE = (1024, 768)
 
 PARENT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+SPRITE_SIZE = (300, 300)
+
 NOTE_SPEED = 300  # px/s
 NOTE_HIT_HEIGHT = 600
 NOTE_RADIUS = 25
@@ -17,3 +19,5 @@ SONG_FADE_TIME_S = 0.5
 GAME_START_DELAY = 1.5
 
 NOTE_INDICATOR_TIME_ACTIVE = 0.15
+
+FLAG_WIDTH = 60

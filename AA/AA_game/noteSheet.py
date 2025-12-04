@@ -13,7 +13,6 @@ noteColors = {
 }
 
 hittableYCoord = settings.NOTE_HIT_HEIGHT - settings.NOTE_RADIUS + settings.TIME_NOTE_HITTABLE * settings.NOTE_SPEED
-print(hittableYCoord)
 
 
 class DeactivatedNote:
