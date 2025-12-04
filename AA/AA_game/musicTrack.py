@@ -109,6 +109,7 @@ class TrackBeatMap:
                                        f"AA_chansons/{chosenTrack.value}.mp3")
 
         self._songLength = pygame.mixer.Sound(self._audioFile).get_length()
+        self._songLength = 500
 
         with open(os.path.join(settings.PARENT_PATH,
                                f"AA_chansons/beat-{chosenTrack.value}.json"),

@@ -60,9 +60,10 @@ class Player:
                 closestNote = lane.activeNotes[0]
                 deltaTime = musicElapsedTime - closestNote.timingTimestamp
                 if deltaTime >= settings.TIME_NOTE_HITTABLE:
-                    self._registerNoteHit(score.getHitType(deltaTime))
+                    hitType = score.getHitType(deltaTime)
+                    self._registerNoteHit(hitType)
                     self._noteSheet.deactivateNote(lane.activeNotes.pop(0),
-                                                   lane.laneID)
+                                                   lane.laneID, hitType)
 
     def _updateNoteStatus(self, musicElapsedTime: float):
         for lane in self._trackSection.lanes:
@@ -73,11 +74,12 @@ class Player:
                     break
 
             for note in lane.activeNotes:
-                if score.getHitType(musicElapsedTime - note.timingTimestamp,
-                                    False) == score.HitType.Manqué:
+                if score.wasNoteMissed(note.timingTimestamp -
+                                       musicElapsedTime):
                     self._registerNoteHit(score.HitType.Manqué)
                     self._noteSheet.deactivateNote(lane.activeNotes.pop(0),
-                                                   lane.laneID, True)
+                                                   lane.laneID,
+                                                   score.HitType.Manqué)
                 calculatedYPos = settings.NOTE_HIT_HEIGHT - (
                     (note.timingTimestamp - musicElapsedTime) *
                     settings.NOTE_SPEED)

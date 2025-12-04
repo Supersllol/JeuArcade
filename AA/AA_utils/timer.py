@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import pygame
+import pygame, math
 
 
 class Timer:
