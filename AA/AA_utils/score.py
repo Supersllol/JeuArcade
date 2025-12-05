@@ -29,7 +29,6 @@ hitTimeOffsets = {
 }
 
 sortedHitTimeOffsets = sorted(list(hitTimeOffsets.keys()))
-print(sortedHitTimeOffsets[1:])
 
 
 def wasNoteMissed(beatOffset: float):

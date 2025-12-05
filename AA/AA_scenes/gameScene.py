@@ -89,6 +89,9 @@ class GameScene(sceneClass.Scene):
                 self._fadeOutStarted = False
                 self._state = gameStates.GameState.WAIT_FOR_ATTACK
 
+        elif self._state == gameStates.GameState.WAIT_FOR_ATTACK:
+            pass
+
         for player in self._players:
             player.update(currentMusicElapsed, self._state, self._inputManager)
 
