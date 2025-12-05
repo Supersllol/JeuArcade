@@ -141,7 +141,7 @@ class NoteSheet:
         self._noteIndicators = [
             NoteIndicator(
                 self._mainSheet, i,
-                (self.getLaneCenterXPos(i), settings.NOTE_HIT_HEIGHT))
+                (self.getLaneCenterXPos(i), settings.NOTE_HIT_HEIGHT - 3))
             for i in range(4)
         ]
 
@@ -181,6 +181,9 @@ class NoteSheet:
             self._mainSheet.fill((0, 0, 0, 0))
         else:
             self._mainSheet.fill((0, 0, 0, 100))
+            pygame.draw.line(self._mainSheet, (255, 255, 255),
+                             (0, hittableYCoord),
+                             (self._mainSheet.get_width(), hittableYCoord), 3)
 
         for id, deactivatedNote in enumerate(self._deactivatedNotes):
             if not deactivatedNote.isNoteAlive():
@@ -192,9 +195,6 @@ class NoteSheet:
             noteIndicator.update()
 
         self._hitTypeIndicator.update()
-
-        pygame.draw.line(self._mainSheet, (255, 255, 255), (0, hittableYCoord),
-                         (self._mainSheet.get_width(), hittableYCoord), 3)
 
         misc.placeSurfaceInHalf(self._playerID, self._mainSheet,
                                 self._playerHalf, (365, 0))

@@ -25,6 +25,8 @@ moveBindings = {
     3: ButtonInputs.L2
 }
 
+attackBtn = ButtonInputs.D
+
 
 # Enumerations for directional axes used by the input system
 class AxisInputs(Enum):
@@ -140,7 +142,9 @@ class InputManager:
                 playerPrevAxisStates[axis] = self._checkAxisValue(
                     axis, joystick)
 
-    def getBtnsPressed(self, playerID: int, onlyCheckForNew: bool = True):
+    def getBtnsPressed(self,
+                       playerID: int,
+                       onlyCheckForNew: bool = True) -> list[ButtonInputs]:
         """Return a list of ButtonInputs that are currently pressed.
         If onlyCheckForNew is True, only return buttons that became pressed
         since the last update() call (rising edge detection).

@@ -98,19 +98,24 @@ class GameScene(sceneClass.Scene):
                 self._musicManager.stop()
                 self._fadeOutStarted = False
                 self._stateTimer.restart()
+                for player in self._players:
+                    player.attackPressed = False
                 self._state = gameStates.GameState.WAIT_FOR_ATTACK
 
         elif self._state == gameStates.GameState.WAIT_FOR_ATTACK:
             if self._stateTimer.elapsed() >= 3:
-                nextSectionID = self._currentTrackSection.ID + 1
-                if (nextSectionID + 1) > self._chosenTrack.nbrSections:
-                    self._state = gameStates.GameState.END
-                    print("end")
+                if any([player.attackPressed for player in self._players]):
+                    self._state = gameStates.GameState.FIGHT_SCENE
                 else:
-                    self._currentTrackSection = self._chosenTrack.getSection(
-                        nextSectionID)
-                    self._stateTimer.restart()
-                    self._state = gameStates.GameState.PRE_COUNTDOWN_DELAY
+                    nextSectionID = self._currentTrackSection.ID + 1
+                    if (nextSectionID + 1) > self._chosenTrack.nbrSections:
+                        self._state = gameStates.GameState.END
+                        print("end")
+                    else:
+                        self._currentTrackSection = self._chosenTrack.getSection(
+                            nextSectionID)
+                        self._stateTimer.restart()
+                        self._state = gameStates.GameState.PRE_COUNTDOWN_DELAY
             else:
                 txtCountdown = fontManager.upheaval(
                     str(3 - int(self._stateTimer.elapsed())), 80,
@@ -131,6 +136,9 @@ class GameScene(sceneClass.Scene):
                         txtInstructions.get_rect(
                             center=(self._mainApp.get_rect().centerx,
                                     self._mainApp.get_rect().centery - 40))))
+
+        elif self._state == gameStates.GameState.FIGHT_SCENE:
+            pass
 
         for player in self._players:
             player.update(currentMusicElapsed, self._state, self._inputManager)

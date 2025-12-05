@@ -19,6 +19,7 @@ class Player:
         self._playerID = playerID
         self._mainApp = mainApp
         self._cpu = cpu
+        self._attackPressed = False
 
         self._playerHalf = pygame.Surface(
             ((mainApp.get_width() / 2) + 50, mainApp.get_height()),
@@ -33,6 +34,14 @@ class Player:
     @property
     def chi(self):
         return self._chi
+
+    @property
+    def attackPressed(self):
+        return self._attackPressed
+
+    @attackPressed.setter
+    def attackPressed(self, newVal: bool):
+        self._attackPressed = newVal
 
     @chi.setter
     def chi(self, newValue: int):
@@ -96,6 +105,10 @@ class Player:
             if gameState in gameStates.statesAllowMoves:
                 if btn in inputManager.moveBindings.values():
                     self._userHitNote(btn, musicElapsedTime)
+
+            if gameState == gameStates.GameState.WAIT_FOR_ATTACK:
+                if btn == inputManager.attackBtn:
+                    self._attackPressed = True
 
         self._updateNoteStatus(musicElapsedTime)
 
