@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-FRAMERATE = 60
+FRAMERATE = 15
 WINDOW_SIZE = (1024, 768)
 
 PARENT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,8 +21,6 @@ SECTION_SWITCH_BUFFER_TIME = 0.5
 
 NOTE_INDICATOR_TIME_ACTIVE = 0.15
 
-HIT_TYPE_FADE_IN = 0.05
-HIT_TYPE_ACTIVE = 0.5
-HIT_TYPE_FADE_OUT = 0.15
+HIT_TYPE_TIME_ACTIVE = 0.4
 
 FLAG_WIDTH = 60

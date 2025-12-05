@@ -101,27 +101,16 @@ class HitTypeIndicator:
         self._activeTimer.restart()
 
     def update(self):
+        """Show the hit-type text while its timer is within the total display time,
+        otherwise stop the timer and do nothing (no fading)."""
         time = self._activeTimer.elapsed()
-        total_time = settings.HIT_TYPE_FADE_IN + settings.HIT_TYPE_ACTIVE + settings.HIT_TYPE_FADE_OUT
-
-        if time >= total_time:
-            # Animation complete
-            transparency = 0
+        # If the timer expired, stop and don't draw
+        if time >= settings.HIT_TYPE_TIME_ACTIVE:
             self._activeTimer.stop()
-        elif time >= (settings.HIT_TYPE_FADE_IN + settings.HIT_TYPE_ACTIVE):
-            # Fade out phase: go from 255 → 0
-            elapsed_fade = time - (settings.HIT_TYPE_FADE_IN +
-                                   settings.HIT_TYPE_ACTIVE)
-            transparency = int(255 *
-                               (1 - elapsed_fade / settings.HIT_TYPE_FADE_OUT))
-        elif time >= settings.HIT_TYPE_FADE_IN:
-            # Active phase: full opacity
-            transparency = 255
-        else:
-            # Fade in phase: go from 0 → 255
-            transparency = int(255 * (time / settings.HIT_TYPE_FADE_IN))
+            self._textSurface.fill((0, 0, 0, 0))
+            return
 
-        self._textSurface.set_alpha(transparency)
+        # Otherwise just blit the pre-rendered surface (full opacity)
         self._mainSheet.blit(
             self._textSurface,
             self._textSurface.get_rect(midtop=(self._mainSheet.get_width() / 2,
