@@ -3,7 +3,7 @@ from __future__ import annotations
 import pygame
 
 from AA.AA_utils import misc, settings, timer, fontManager, inputManager, score
-from AA.AA_game import musicTrack
+from AA.AA_game import musicTrack, gameStates
 
 noteColors = {
     0: (213, 0, 0, 255),
@@ -175,8 +175,12 @@ class NoteSheet:
     def laneBtnPressed(self, laneID: int):
         self._noteIndicators[laneID].setActive()
 
-    def update(self, noteSection: musicTrack.TrackSection):
-        self._mainSheet.fill((0, 0, 0, 100))
+    def update(self, noteSection: musicTrack.TrackSection,
+               gameState: gameStates.GameState):
+        if gameState == gameStates.GameState.FIGHT_SCENE:
+            self._mainSheet.fill((0, 0, 0, 0))
+        else:
+            self._mainSheet.fill((0, 0, 0, 100))
 
         for id, deactivatedNote in enumerate(self._deactivatedNotes):
             if not deactivatedNote.isNoteAlive():

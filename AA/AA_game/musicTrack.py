@@ -76,10 +76,16 @@ class NoteLane:
 
 class TrackSection:
 
-    def __init__(self, lanes: tuple[NoteLane, ...], start: float, end: float):
+    def __init__(self, ID: int, lanes: tuple[NoteLane, ...], start: float,
+                 end: float):
+        self._ID = ID
         self._lanes = lanes
         self._musicStart = start
         self._musicEnd = end
+
+    @property
+    def ID(self):
+        return self._ID
 
     @property
     def lanes(self):
@@ -143,7 +149,7 @@ class TrackBeatMap:
             newNote = TrackNote(time)
             lanes[move].queueNote(newNote)
 
-        return TrackSection(lanes, sectionStart, sectionEnd)
+        return TrackSection(sectionID, lanes, sectionStart, sectionEnd)
 
     @property
     def audioFile(self):

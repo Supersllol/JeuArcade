@@ -8,11 +8,12 @@ class MusicManager:
 
     def __init__(self):
         self._musicTimer = timer.Timer()
+        self._musicTimer.stop()
 
-    def play(self, song: str, startSeconds: float):
+    def play(self, song: str, startSeconds: float, fadeinMs: int = 0):
         pygame.mixer.music.load(song)
-        pygame.mixer.music.play(0, startSeconds)
-        self._musicTimer.restart()
+        pygame.mixer.music.play(0, startSeconds, fadeinMs)
+        self._musicTimer.setAndStart(startSeconds)
 
     def fadeout(self, fadeoutMs: int):
         pygame.mixer.music.fadeout(fadeoutMs)

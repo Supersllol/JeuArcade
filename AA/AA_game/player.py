@@ -76,6 +76,7 @@ class Player:
             for note in lane.activeNotes:
                 if score.wasNoteMissed(note.timingTimestamp -
                                        musicElapsedTime):
+
                     self._registerNoteHit(score.HitType.Manqué)
                     self._noteSheet.deactivateNote(lane.activeNotes.pop(0),
                                                    lane.laneID,
@@ -98,7 +99,7 @@ class Player:
 
         self._updateNoteStatus(musicElapsedTime)
 
-        self._noteSheet.update(self._trackSection)
+        self._noteSheet.update(self._trackSection, gameState)
         self._chiBar.update(self._chi)
         self._sprite.update(self._health)
 
