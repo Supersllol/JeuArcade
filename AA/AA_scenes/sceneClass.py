@@ -16,9 +16,13 @@ class Scene:
         self._mainApp = mainApp
 
         # Flag indicating whether this scene has finished and should transition
-        self._finished = False
+        self._sceneFinished = False
         # Timer used to track time spent in the current scene / state
         self._stateTimer = timer.Timer()
+
+        self._fadeTimer = timer.Timer()
+        self._fadeInFinished = False
+        self._blackMask = pygame.Surface(mainApp.get_size(), pygame.SRCALPHA)
         # Shared input manager instance (keyboard / joystick abstraction)
         self._inputManager = inputManager
         # Shared input manager instance (audio abstraction)
@@ -27,6 +31,8 @@ class Scene:
     def initScene(self):
         # Called once when the scene becomes active — reset internal timer.
         self._stateTimer.restart()
+        self._fadeTimer.restart()
+        self.fadeinScene()
 
     def loopScene(self, events: list[pygame.event.Event]):
         # Parent loop. Should be called after the child loop to update the button
@@ -45,11 +51,8 @@ class Scene:
             # Debug: print any newly active axes
             # if newAxes: print(f"{i} : {newAxes}")
 
-        if self._finished:
-            self.fadeoutScene()
-        else:
-            # self.fadeinScene()
-            pass
+        if not self._fadeInFinished:
+            self.fadeinScene()
 
         # Update input manager snapshot AFTER processing inputs so that
         # getBtnsPressed/getAxesActive detect rising edges relative to the
@@ -61,29 +64,30 @@ class Scene:
         # Override in subclasses to return the next scene when finished.
         return None
 
-    def fadeinScene(self, startime: float = 0.0):
+    def fadeinScene(self):
         # Fade-in effect when scene starts
-        self._stateTimer.start()
-        blackmask = pygame.Surface(self._mainApp.get_size())
-        blackmask = blackmask.convert()
-        alpha = 255 - min(255, int((self._stateTimer.elapsed()) * 255))
-        blackmask.fill((0, 0, 0, alpha))
-        self._mainApp.blit(blackmask, (0, 0))
+        if self._fadeTimer.elapsed() >= 1:
+            self._fadeInFinished = True
+            self._fadeTimer.stop()
+            return
+        self._fadeTimer.start()
+        alpha = 255 - min(255, int((self._fadeTimer.elapsed()) * 255))
+        self._blackMask.fill((0, 0, 0, alpha))
+        self._mainApp.blit(self._blackMask, (0, 0))
 
     def fadeoutScene(self):
+        """Returns true when fadeout is finished"""
         # Fade-out effect when scene ends
-        self._stateTimer.start()
-        blackmask = pygame.Surface(self._mainApp.get_size())
-        blackmask = blackmask.convert()
-        alpha = min(255, int((self._stateTimer.elapsed()) * 255))
-        print(self._stateTimer.elapsed())
-        blackmask.fill((0, 0, 0, alpha))
-        self._mainApp.blit(blackmask, (0, 0))
+        self._fadeTimer.start()
+        alpha = min(255, int((self._fadeTimer.elapsed()) * 255))
+        self._blackMask.fill((0, 0, 0, alpha))
+        self._mainApp.blit(self._blackMask, (0, 0))
+        return self._fadeTimer.elapsed() >= 1
 
     @property
-    def finished(self):
-        return self._finished
+    def sceneFinished(self):
+        return self._sceneFinished
 
-    @finished.setter
-    def finished(self, newVal: bool):
-        self._finished = newVal
+    @sceneFinished.setter
+    def sceneFinished(self, newVal: bool):
+        self._sceneFinished = newVal

@@ -4,6 +4,7 @@ import os
 import sys
 import pygame
 import math
+from AA.AA_scenes import homeScene
 
 # Ensure project root is in sys.path when running this file directly
 if __name__ == "__main__":
@@ -14,6 +15,7 @@ if __name__ == "__main__":
 
 from AA.AA_scenes.sceneClass import Scene
 from AA.AA_utils import inputManager, musicManager, settings
+
 
 class SplashScene(Scene):
 
@@ -26,9 +28,11 @@ class SplashScene(Scene):
         images_dir = os.path.join(settings.PARENT_PATH, "AA_images")
 
         # Load and scale background
-        self.bg_image = pygame.image.load(os.path.join(images_dir, "splashscreen.png")).convert()
-        self.bg_image = pygame.transform.scale(self.bg_image, settings.WINDOW_SIZE)
-        self.display_duration = 3  # Duration to display splash screen in milliseconds
+        self.bg_image = pygame.image.load(
+            os.path.join(images_dir, "splashscreen.png")).convert()
+        self.bg_image = pygame.transform.scale(self.bg_image,
+                                               settings.WINDOW_SIZE)
+        self.display_duration = 3  # Duration to display splash screen in seconds
 
     def initScene(self):
         super().initScene()
@@ -39,12 +43,17 @@ class SplashScene(Scene):
         self._mainApp.blit(self.bg_image, (0, 0))
 
         # Check elapsed time
-        if self._stateTimer.elapsed() >= self.display_duration and not self._finished:
-            self._stateTimer.stop()
-            self._finished = True
+        if self._stateTimer.elapsed(
+        ) >= self.display_duration and not self.sceneFinished:
+            self.sceneFinished = True
 
         # Call parent loop to handle input and quitting
         return super().loopScene(events)
+
+    def getTransition(self) -> Scene | None:
+        return homeScene.HomeScene(self._mainApp, self._inputManager,
+                                   self._musicManager)
+
 
 # Standalone test harness
 if __name__ == "__main__":

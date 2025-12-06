@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pygame
-from AA.AA_scenes import gameScene, homeScene
+from AA.AA_scenes import gameScene, homeScene, splashScene
 from AA.AA_utils import inputManager, musicManager, countries, settings
 from AA.AA_game import musicTrack, player
 
@@ -28,11 +28,12 @@ def main():
 
     # currentScene = introScene.IntroScene(mainApp, input)
     # currentScene = homeScene.HomeScene(mainApp, input, music)
+    currentScene = splashScene.SplashScene(mainApp, input, music)
     player0 = player.Player("SIM", countries.CountryOptions.PNG, 0, mainApp)
     player1 = player.Player("MIS", countries.CountryOptions.CAN, 1, mainApp)
-    currentScene = gameScene.GameScene(mainApp, input, music,
-                                       musicTrack.GameTracks.SEMI_CHARMED_LIFE,
-                                       (player0, player1))
+    # currentScene = gameScene.GameScene(mainApp, input, music,
+    #                                    musicTrack.GameTracks.SEMI_CHARMED_LIFE,
+    #                                    (player0, player1))
     ACTIF = True
     clock = pygame.time.Clock()
 
@@ -42,11 +43,12 @@ def main():
         if not currentScene.loopScene([event for event in pygame.event.get()]):
             ACTIF = False
 
-        if currentScene.finished:
-            newScene = currentScene.getTransition()
-            if newScene:
-                newScene.initScene()
-                currentScene = newScene
+        if currentScene.sceneFinished:
+            if currentScene.fadeoutScene():
+                newScene = currentScene.getTransition()
+                if newScene:
+                    newScene.initScene()
+                    currentScene = newScene
 
         clock.tick(settings.FRAMERATE)
         pygame.display.flip()
