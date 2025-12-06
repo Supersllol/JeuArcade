@@ -26,6 +26,7 @@ class HomeScene(Scene):
 
         # Asset base path
         images_dir = os.path.join(settings.PARENT_PATH, "AA_images")
+        icon_dir = os.path.join(images_dir, "AA_input_instruction")
 
         # Load background and scale to window
         self.bg_image = pygame.image.load(os.path.join(images_dir, "dojo.jpg")).convert()
@@ -39,6 +40,15 @@ class HomeScene(Scene):
         self._title_base_size = self._title_base_image.get_size()
         # Position title at the very top of the screen
         self.title_rect = self.title_image.get_rect(centerx=settings.WINDOW_SIZE[0] // 2, top=-20)
+
+        self._icons = {
+            "a": pygame.image.load(os.path.join(icon_dir, "Valider - A.png")).convert_alpha(),
+            "select": pygame.image.load(os.path.join(icon_dir, "Quitter - Select.png")).convert_alpha(),
+            "joystick": pygame.image.load(os.path.join(icon_dir, "Déplacer - Joystick.png")).convert_alpha()
+        }
+        # Scale input icons uniformly
+        for key, img in list(self._icons.items()):
+            self._icons[key] = pygame.transform.scale(img, (150, 50))
 
         # Heartbeat animation parameters
         self._heart_time = 0.0
@@ -117,7 +127,7 @@ class HomeScene(Scene):
                 self.selected_index = (self.selected_index + 1) % len(self.btn_images)
             
             new_btns = self._inputManager.getBtnsPressed(i, onlyCheckForNew=True)
-            if inputManager.ButtonInputs.A in new_btns or inputManager.ButtonInputs.START in new_btns:
+            if inputManager.ButtonInputs.A in new_btns:
                 # Trigger action
                 print(f"Selected: {self.btn_names[self.selected_index]}")
                 # TODO: Implement transition based on selection
@@ -191,6 +201,14 @@ class HomeScene(Scene):
                 self._mainApp.blit(tint_surface, rect)
             else:
                 self._mainApp.blit(scaled_img, rect)
+
+        # Button input instructions at bottom
+        # A input
+        self._mainApp.blit(self._icons["joystick"], (40, settings.WINDOW_SIZE[1] - 180))
+        # Select input
+        self._mainApp.blit(self._icons["a"], (45, settings.WINDOW_SIZE[1] - 120))
+        # Joystick input
+        self._mainApp.blit(self._icons["select"], (30, settings.WINDOW_SIZE[1] - 60))
 
         return super().loopScene(events)
 
