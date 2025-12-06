@@ -1,8 +1,16 @@
 from __future__ import annotations
 
 import os
+import sys
 import pygame
 import math
+
+# Ensure project root is in sys.path when running this file directly
+if __name__ == "__main__":
+    project_root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    if project_root not in sys.path:
+        sys.path.insert(0, project_root)
 
 from AA.AA_scenes.sceneClass import Scene
 from AA.AA_utils import inputManager, musicManager, settings

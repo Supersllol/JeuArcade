@@ -66,8 +66,7 @@ class Scene:
         blackmask = pygame.Surface(self._mainApp.get_size())
         blackmask = blackmask.convert()
         alpha = 255 - min(255, int((self._stateTimer.elapsed()) * 255))
-        blackmask.fill((0, 0, 0))
-        blackmask.set_alpha(alpha)
+        blackmask.fill((0, 0, 0, alpha))
         self._mainApp.blit(blackmask, (0, 0))
 
     def fadeoutScene(self):
@@ -77,8 +76,7 @@ class Scene:
         blackmask = blackmask.convert()
         alpha = min(255, int((self._stateTimer.elapsed()) * 255))
         print(self._stateTimer.elapsed())
-        blackmask.fill((0, 0, 0))
-        blackmask.set_alpha(alpha)
+        blackmask.fill((0, 0, 0, alpha))
         self._mainApp.blit(blackmask, (0, 0))
 
     @property

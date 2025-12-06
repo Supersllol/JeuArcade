@@ -3,11 +3,12 @@ from __future__ import annotations
 import os
 import sys
 
-# Ensure parent directory is in sys.path when running this file directly
+# Ensure project root is in sys.path when running this file directly
 if __name__ == "__main__":
-    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    if parent_dir not in sys.path:
-        sys.path.insert(0, parent_dir)
+    project_root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    if project_root not in sys.path:
+        sys.path.insert(0, project_root)
 
 import pygame
 import math
