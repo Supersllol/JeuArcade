@@ -85,11 +85,73 @@ class HomeScene(Scene):
         self.animation_time = 0
         self.glow_speed = 3  # Speed of pulsing effect
 
+        # Preload cached images for performance
+        self._preload_cached_images()
+
+        # Cache indices for sequential access
+        self._title_cache_index = 0
+        self._glow_cache_index = 0
+
+    def _preload_cached_images(self):
+
+        self._title_cache = []
+        seconds_per_beat = 60.0 / max(self._heart_bpm, 1)
+        num_samples = 15
+
+        base_w, base_h = self._title_base_size
+
+        for i in range(num_samples):
+            t = (i / num_samples) * seconds_per_beat
+            hb_scale = self._heartbeat_scale(t)
+
+            scaled_w = max(1, int(base_w * hb_scale))
+            scaled_h = max(1, int(base_h * hb_scale))
+            scaled_img = pygame.transform.smoothscale(self._title_base_image, (scaled_w, scaled_h))
+
+            vertical_bump = int((hb_scale - self._heart_scale_min) /
+                               (self._heart_scale_max - self._heart_scale_min + 1e-6) *
+                               self._heart_vertical_bump_px)
+
+            self._title_cache.append((scaled_img, vertical_bump))
+
+        self._glow_cache = []
+        glow_samples = 15
+        width, height = self.btn_size
+        glow_padding = 2
+
+        for i in range(glow_samples):
+            pulse = math.sin((i / glow_samples) * 2 * math.pi) * 0.5 + 0.5  # 0 to 1
+            glow_intensity = int(pulse * 100 + 100)
+            border_thickness = int(3 + pulse * 2)
+            border_color = (255, 215, 0, glow_intensity)
+
+
+            glow_surface = pygame.Surface((width + glow_padding * 2,
+                                          height + glow_padding * 2),
+                                         pygame.SRCALPHA)
+
+            for layer in range(2):
+                alpha = glow_intensity // (layer + 1)
+                layer_offset = layer * border_thickness // 5
+                glow_rect = pygame.Rect(layer_offset, layer_offset,
+                                       width + glow_padding * 2 - layer_offset * 2,
+                                       height + glow_padding * 2 - layer_offset * 2)
+                pygame.draw.rect(glow_surface, (*border_color[:3], alpha), glow_rect,
+                               border_thickness - layer)
+
+            tint_overlay = pygame.Surface((width, height), pygame.SRCALPHA)
+            tint_color = (255, 215, 0, int(pulse * 40))
+            tint_overlay.fill(tint_color)
+
+            self._glow_cache.append((glow_surface, tint_overlay, glow_padding))
+
     def initScene(self):
         super().initScene()
         # Reset animation timer on scene init
         self.animation_time = 0
         self._heart_time = 0.0
+        self._title_cache_index = 0
+        self._glow_cache_index = 0
         # Play menu music if available? (Not requested yet)
 
     def _heartbeat_scale(self, t: float) -> float:
@@ -118,6 +180,10 @@ class HomeScene(Scene):
         self.animation_time += 1 / settings.FRAMERATE
         self._heart_time += 1 / settings.FRAMERATE
 
+        # Increment cache indices
+        self._title_cache_index = (self._title_cache_index + 1) % len(self._title_cache)
+        self._glow_cache_index = (self._glow_cache_index + 1) % len(self._glow_cache)
+
         # Input: navigate with up/down, confirm with A/Start
         for i in range(2): # Check both players
             new_axes = self._inputManager.getAxesActive(i, onlyCheckForNew=True)
@@ -135,15 +201,8 @@ class HomeScene(Scene):
         # Draw: background + title
         self._mainApp.blit(self.bg_image, (0, 0))
 
-        # Heartbeat bump for title (scale + slight vertical offset)
-        hb_scale = self._heartbeat_scale(self._heart_time)
-        base_w, base_h = self._title_base_size
-        scaled_w = max(1, int(base_w * hb_scale))
-        scaled_h = max(1, int(base_h * hb_scale))
-        self.title_image = pygame.transform.smoothscale(self._title_base_image, (scaled_w, scaled_h))
-
-        # Recompute rect: keep centered horizontally, and top anchored near -20 with vertical bump on beat
-        vertical_bump = int((hb_scale - self._heart_scale_min) / (self._heart_scale_max - self._heart_scale_min + 1e-6) * self._heart_vertical_bump_px)
+        # Use cached heartbeat title images - just get next frame
+        self.title_image, vertical_bump = self._title_cache[self._title_cache_index]
         self.title_rect = self.title_image.get_rect(centerx=settings.WINDOW_SIZE[0] // 2, top=-20 - vertical_bump)
 
         self._mainApp.blit(self.title_image, self.title_rect)
@@ -161,41 +220,17 @@ class HomeScene(Scene):
             y_pos = self.btn_start_y + (i * self.btn_spacing)
             rect = scaled_img.get_rect(centerx=center_x, centery=y_pos)
 
-            # If selected, draw glow + tint; otherwise draw as-is
+            # If selected, use cached glow effects
             if is_selected:
-                # Create pulsing glow effect
-                pulse = math.sin(self.animation_time * self.glow_speed) * 0.5 + 0.5  # 0 to 1
-                glow_intensity = int(pulse * 100 + 100)  # 50 to 150
-                
-                # Draw animated glow border - very tight around the button
-                border_color = (255, 215, 0, glow_intensity)  # Gold color with pulsing alpha
-                border_thickness = int(3 + pulse * 2)  # 3 to 5 pixels
-                
-                # Create glow surface with very minimal padding (just enough for the border)
-                glow_padding = 2 # Just 4 extra pixels
-                glow_surface = pygame.Surface((width + glow_padding,
-                                              height + glow_padding),
-                                             pygame.SRCALPHA)
-                
-                # Draw multiple layers for glow effect
-                for layer in range(2):  # Reduced to 2 layers for tighter glow
-                    alpha = glow_intensity // (layer + 1)
-                    layer_offset = layer * border_thickness // 5
-                    glow_rect = pygame.Rect(layer_offset, layer_offset, 
-                                           width + glow_padding * 2 - layer_offset * 2, 
-                                           height + glow_padding * 2 - layer_offset * 2)
-                    pygame.draw.rect(glow_surface, (*border_color[:3], alpha), glow_rect, 
-                                   border_thickness - layer)
-                
-                # Blit glow
+                # Get cached glow - just use next frame
+                glow_surface, tint_overlay, glow_padding = self._glow_cache[self._glow_cache_index]
+
+                # Blit cached glow
                 glow_pos = (rect.x - glow_padding, rect.y - glow_padding)
                 self._mainApp.blit(glow_surface, glow_pos)
                 
-                # Add color tint overlay to the button
+                # Add cached tint overlay to the button
                 tint_surface = scaled_img.copy()
-                tint_overlay = pygame.Surface((width, height), pygame.SRCALPHA)
-                tint_color = (255, 215, 0, int(pulse * 40))  # Gold tint with pulsing alpha
-                tint_overlay.fill(tint_color)
                 tint_surface.blit(tint_overlay, (0, 0))
                 
                 self._mainApp.blit(tint_surface, rect)
