@@ -45,6 +45,11 @@ class Scene:
             # Debug: print any newly active axes
             # if newAxes: print(f"{i} : {newAxes}")
 
+        if self._finished:
+            self.fadeoutScene()
+        else:
+            self.fadeinScene()
+
         # Update input manager snapshot AFTER processing inputs so that
         # getBtnsPressed/getAxesActive detect rising edges relative to the
         # previously-stored state. Call once per frame.

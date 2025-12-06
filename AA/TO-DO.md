@@ -19,7 +19,7 @@
 - [x] Implement fading effect for UI transitions
 - [x] Sign the game with the developers name on the main menu screen
 - [ ] Insert key bindings information
-  - [ ] Key bingings in the main menu
+  - [x] Key bingings in the main menu
   - [ ] Key bindings in the nationality selection screen
   - [ ] Key bindings in the name input screen
   - [ ] Key bindings in the rankings screen

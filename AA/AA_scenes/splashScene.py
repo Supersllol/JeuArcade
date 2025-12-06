@@ -35,13 +35,6 @@ class SplashScene(Scene):
             self._stateTimer.stop()
             self._finished = True
 
-        # Fade-out effect if finished
-
-        if self._finished:
-            self.fadeoutScene()
-        else:
-            self.fadeinScene()
-
         # Call parent loop to handle input and quitting
         return super().loopScene(events)
 
