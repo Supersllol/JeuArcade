@@ -212,13 +212,9 @@ class HomeScene(Scene):
         for i, img in enumerate(self.btn_images):
             is_selected = i == self.selected_index
             
-            # Buttons are already normalized; no extra scaling
-            width, height = self.btn_size
-            scaled_img = img  # No scaling needed, already normalized
-            
             # Compute rect position for this button
             y_pos = self.btn_start_y + (i * self.btn_spacing)
-            rect = scaled_img.get_rect(centerx=center_x, centery=y_pos)
+            rect = img.get_rect(centerx=center_x, centery=y_pos)
 
             # If selected, use cached glow effects
             if is_selected:
@@ -230,12 +226,12 @@ class HomeScene(Scene):
                 self._mainApp.blit(glow_surface, glow_pos)
                 
                 # Add cached tint overlay to the button
-                tint_surface = scaled_img.copy()
+                tint_surface = img.copy()
                 tint_surface.blit(tint_overlay, (0, 0))
                 
                 self._mainApp.blit(tint_surface, rect)
             else:
-                self._mainApp.blit(scaled_img, rect)
+                self._mainApp.blit(img, rect)
 
         # Button input instructions at bottom
         # A input
