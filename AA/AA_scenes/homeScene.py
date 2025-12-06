@@ -13,9 +13,12 @@ if __name__ == "__main__":
 import pygame
 import math
 from typing import List
-
+import math
+from typing import List
+from AA.AA_scenes import gameScene
 from AA.AA_scenes.sceneClass import Scene
-from AA.AA_utils import inputManager, musicManager, settings
+from AA.AA_game import musicTrack, player
+from AA.AA_utils import inputManager, musicManager, settings, countries
 
 
 class HomeScene(Scene):
@@ -224,6 +227,10 @@ class HomeScene(Scene):
             if inputManager.ButtonInputs.A in new_btns:
                 # Trigger action
                 print(f"Selected: {self.btn_names[self.selected_index]}")
+                if self.selected_index == 0:
+                    # Solo mode selected
+                    print("Starting Solo Mode...")
+                    self.sceneFinished = True
 
         # Draw: background + title
         self._mainApp.blit(self.bg_image, (0, 0))
@@ -278,8 +285,16 @@ class HomeScene(Scene):
 
     def getTransition(self):
         # Default transition passthrough
-        return super().getTransition()
-
+        print("Transitioning to Game Scene")
+        return gameScene.GameScene(self._mainApp, self._inputManager,
+                                   self._musicManager,
+                                   musicTrack.GameTracks.SEMI_CHARMED_LIFE, (
+                                       player.Player("SIM",
+                                                     countries.CountryOptions.PNG,
+                                                     0, self._mainApp),
+                                       player.Player("MIS",
+                                                     countries.CountryOptions.CAN,
+                                                     1, self._mainApp)))
 
 # Standalone test harness
 if __name__ == "__main__":
