@@ -77,7 +77,7 @@ class HomeScene(Scene):
         self.btn_names = ["Solo", "Face à Face", "Record Mondial"]
         self.selected_index = 0
         
-        # Vertical layout for buttons (start Y and spacing)
+        # Vertical layout for buttons
         self.btn_start_y = 380
         self.btn_spacing = 140
         
@@ -152,7 +152,6 @@ class HomeScene(Scene):
         self._heart_time = 0.0
         self._title_cache_index = 0
         self._glow_cache_index = 0
-        # Play menu music if available? (Not requested yet)
 
     def _heartbeat_scale(self, t: float) -> float:
         # Compute lub-dub pulse strength between 0 and 1
@@ -196,7 +195,6 @@ class HomeScene(Scene):
             if inputManager.ButtonInputs.A in new_btns:
                 # Trigger action
                 print(f"Selected: {self.btn_names[self.selected_index]}")
-                # TODO: Implement transition based on selection
 
         # Draw: background + title
         self._mainApp.blit(self.bg_image, (0, 0))
@@ -268,7 +266,7 @@ if __name__ == "__main__":
     # Main loop
     running = True
     print("Home Screen Test Mode")
-    print("Controls: Arrow keys (UP/DOWN) to navigate, ENTER/SPACE to select, ESC to quit")
+    print("Controls: Arrow keys (UP/DOWN) to navigate, Q to select, ESC to quit")
     
     while running:
         events = pygame.event.get()
