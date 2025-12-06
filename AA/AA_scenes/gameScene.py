@@ -27,17 +27,31 @@ class GameScene(sceneClass.Scene):
 
         self._fadeOutStarted = False
 
-        self._state = gameStates.GameState.PRE_COUNTDOWN_DELAY
+        self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
+        self._fightState = gameStates.FightState.INITIAL_DELAY
 
         super().__init__(mainApp, inputManager, musicManager)
 
     def initScene(self):
-        self._state = gameStates.GameState.WAIT_FOR_ATTACK
+        self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
         self._currentTrackSection = self._chosenTrack.getSection(0)
 
         for player in self._players:
             player.loadSection(copy.deepcopy(self._currentTrackSection))
         super().initScene()
+
+    def _chooseNextSection(self):
+        nextSectionID = self._currentTrackSection.ID + 1
+        if (nextSectionID + 1) > self._chosenTrack.nbrSections:
+            self._gameState = gameStates.GameState.END
+            print("end")
+        else:
+            self._currentTrackSection = self._chosenTrack.getSection(
+                nextSectionID)
+            self._stateTimer.restart()
+            for player in self._players:
+                player.sprite.moveTo(settings.SPRITE_BASE_POS, 0)
+            self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
 
     def _startNextSection(self):
         self._stateTimer.restart()
@@ -53,20 +67,16 @@ class GameScene(sceneClass.Scene):
                                     self._targetStart - 3, 3000)
         for player in self._players:
             player.loadSection(copy.deepcopy(self._currentTrackSection))
-        self._state = gameStates.GameState.MUSIC_COUNTDOWN
+        self._gameState = gameStates.GameState.MUSIC_COUNTDOWN
 
     def _chooseFightOrder(self, playersWithAttack: list[player.Player]):
         if len(playersWithAttack) == 1:
-            print(playersWithAttack[0].attackPressed)
             return playersWithAttack
-        print(playersWithAttack[0].attackPressed,
-              playersWithAttack[1].attackPressed)
         player0, player1 = playersWithAttack[0], playersWithAttack[1]
         deltaScorePlayer0, deltaScorePlayer1 = player0.currentChi - attackUtils.attackChiThresholds[
             player0.
             attackPressed], player1.currentChi - attackUtils.attackChiThresholds[
                 player1.attackPressed]
-        print(deltaScorePlayer0, deltaScorePlayer1)
         if deltaScorePlayer0 == deltaScorePlayer1:
             random.shuffle(playersWithAttack)
             return playersWithAttack
@@ -86,17 +96,17 @@ class GameScene(sceneClass.Scene):
 
         currentText: list[pygameText.PygameText] = []
 
-        if self._state == gameStates.GameState.PRE_COUNTDOWN_DELAY:
+        if self._gameState == gameStates.GameState.PRE_COUNTDOWN_DELAY:
             if self._stateTimer.elapsed() >= settings.PRE_COUNTDOWN_DELAY:
                 self._startNextSection()
 
-        elif self._state == gameStates.GameState.MUSIC_COUNTDOWN:
+        elif self._gameState == gameStates.GameState.MUSIC_COUNTDOWN:
             if self._stateTimer.elapsed() >= 3:
                 if self._currentTrackSection.ID == 0:
                     self._musicManager.play(self._chosenTrack.audioFile,
                                             self._targetStart)
                 self._fadeOutStarted = False
-                self._state = gameStates.GameState.PLAY_SECTION
+                self._gameState = gameStates.GameState.PLAY_SECTION
             else:
                 txt = fontManager.upheaval(
                     str(3 - int(self._stateTimer.elapsed())), 250,
@@ -109,7 +119,7 @@ class GameScene(sceneClass.Scene):
                             center=(self._mainApp.get_rect().centerx,
                                     self._mainApp.get_rect().centery))))
 
-        elif self._state == gameStates.GameState.PLAY_SECTION:
+        elif self._gameState == gameStates.GameState.PLAY_SECTION:
             if not self._fadeOutStarted and (
                     currentMusicElapsed >= self._currentTrackSection.musicEnd -
                     settings.SONG_FADE_TIME_S):
@@ -123,9 +133,9 @@ class GameScene(sceneClass.Scene):
                 self._stateTimer.restart()
                 for player in self._players:
                     player.attackPressed = attackUtils.AttackType.Rien
-                self._state = gameStates.GameState.WAIT_FOR_ATTACK
+                self._gameState = gameStates.GameState.WAIT_FOR_ATTACK
 
-        elif self._state == gameStates.GameState.WAIT_FOR_ATTACK:
+        elif self._gameState == gameStates.GameState.WAIT_FOR_ATTACK:
             if self._stateTimer.elapsed() >= 3:
                 playersWithAttack = [
                     player for player in self._players
@@ -134,18 +144,11 @@ class GameScene(sceneClass.Scene):
                 if len(playersWithAttack) != 0:
                     self._fightOrder = self._chooseFightOrder(
                         playersWithAttack)
-                    print(self._fightOrder[0]._playerID)
-                    self._state = gameStates.GameState.FIGHT_SCENE
+                    self._gameState = gameStates.GameState.FIGHT_SCENE
+                    self._fightState = gameStates.FightState.INITIAL_DELAY
+                    self._stateTimer.restart()
                 else:
-                    nextSectionID = self._currentTrackSection.ID + 1
-                    if (nextSectionID + 1) > self._chosenTrack.nbrSections:
-                        self._state = gameStates.GameState.END
-                        print("end")
-                    else:
-                        self._currentTrackSection = self._chosenTrack.getSection(
-                            nextSectionID)
-                        self._stateTimer.restart()
-                        self._state = gameStates.GameState.PRE_COUNTDOWN_DELAY
+                    self._chooseNextSection()
             else:
                 txtCountdown = fontManager.upheaval(
                     str(3 - int(self._stateTimer.elapsed())), 80,
@@ -167,11 +170,26 @@ class GameScene(sceneClass.Scene):
                             center=(self._mainApp.get_rect().centerx,
                                     self._mainApp.get_rect().centery - 40))))
 
-        elif self._state == gameStates.GameState.FIGHT_SCENE:
-            pass
+        elif self._gameState == gameStates.GameState.FIGHT_SCENE:
+            if self._fightState == gameStates.FightState.INITIAL_DELAY:
+                if self._stateTimer.elapsed() >= settings.FIGHT_DELAY:
+                    self._fightState = gameStates.FightState.TURN_TO_MIDDLE
+
+            elif self._fightState == gameStates.FightState.TURN_TO_MIDDLE:
+                # TODO: animate turn to middle
+                self._stateTimer.restart()
+                for player in self._players:
+                    player.sprite.moveTo(settings.SPRITE_FIGHT_POS,
+                                         settings.FIGHT_TIME_TO_MIDDLE)
+                self._fightState = gameStates.FightState.MOVE_TO_MIDDLE
+
+            elif self._fightState == gameStates.FightState.MOVE_TO_MIDDLE:
+                if self._stateTimer.elapsed() >= settings.FIGHT_TIME_TO_MIDDLE:
+                    self._chooseNextSection()
 
         for player in self._players:
-            player.update(currentMusicElapsed, self._state, self._inputManager)
+            player.update(currentMusicElapsed, self._gameState,
+                          self._inputManager)
 
         for txt in currentText:
             self._mainApp.blit(txt.text, txt.position)

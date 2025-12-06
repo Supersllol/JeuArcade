@@ -12,4 +12,10 @@ class GameState(Enum):
     END = auto()
 
 
+class FightState(Enum):
+    INITIAL_DELAY = auto()
+    TURN_TO_MIDDLE = auto()
+    MOVE_TO_MIDDLE = auto()
+
+
 statesAllowMoves = [GameState.MUSIC_COUNTDOWN, GameState.PLAY_SECTION]

@@ -173,15 +173,14 @@ class NoteSheet:
             pygame.draw.line(self._mainSheet, (255, 255, 255),
                              (0, hittableYCoord),
                              (self._mainSheet.get_width(), hittableYCoord), 3)
+            for noteIndicator in self._noteIndicators:
+                noteIndicator.update()
 
         for id, deactivatedNote in enumerate(self._deactivatedNotes):
             if not deactivatedNote.isNoteAlive():
                 self._deactivatedNotes.pop(id)
 
         self._drawNotes(noteSection)
-
-        for noteIndicator in self._noteIndicators:
-            noteIndicator.update()
 
         self._hitTypeIndicator.update()
 

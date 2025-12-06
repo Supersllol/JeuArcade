@@ -48,7 +48,8 @@ class Scene:
         if self._finished:
             self.fadeoutScene()
         else:
-            self.fadeinScene()
+            # self.fadeinScene()
+            pass
 
         # Update input manager snapshot AFTER processing inputs so that
         # getBtnsPressed/getAxesActive detect rising edges relative to the

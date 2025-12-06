@@ -72,6 +72,10 @@ class Player:
     def attackPressed(self, newVal: attackUtils.AttackType):
         self._registeredAttack = newVal
 
+    @property
+    def sprite(self):
+        return self._sprite
+
     def loadSection(self, newSection: musicTrack.TrackSection):
         newSection.queueAllNotes()
         for lane in newSection.lanes:
