@@ -1,9 +1,9 @@
 from __future__ import annotations
 from AA.AA_scenes import sceneClass
-from AA.AA_utils import fontManager, inputManager, pygameText, musicManager, settings
+from AA.AA_utils import fontManager, inputManager, pygameText, musicManager, settings, attackUtils
 from AA.AA_game import musicTrack, player, gameStates
 from enum import Enum, auto
-import pygame, os, math, copy
+import pygame, os, math, copy, random
 
 
 class GameScene(sceneClass.Scene):
@@ -23,6 +23,8 @@ class GameScene(sceneClass.Scene):
         self._currentTrackSection: musicTrack.TrackSection
         self._targetStart = 0
 
+        self._fightOrder: list[player.Player] = []
+
         self._fadeOutStarted = False
 
         self._state = gameStates.GameState.PRE_COUNTDOWN_DELAY
@@ -30,7 +32,7 @@ class GameScene(sceneClass.Scene):
         super().__init__(mainApp, inputManager, musicManager)
 
     def initScene(self):
-        self._state = gameStates.GameState.PRE_COUNTDOWN_DELAY
+        self._state = gameStates.GameState.WAIT_FOR_ATTACK
         self._currentTrackSection = self._chosenTrack.getSection(0)
 
         for player in self._players:
@@ -52,6 +54,27 @@ class GameScene(sceneClass.Scene):
         for player in self._players:
             player.loadSection(copy.deepcopy(self._currentTrackSection))
         self._state = gameStates.GameState.MUSIC_COUNTDOWN
+
+    def _chooseFightOrder(self, playersWithAttack: list[player.Player]):
+        if len(playersWithAttack) == 1:
+            print(playersWithAttack[0].attackPressed)
+            return playersWithAttack
+        print(playersWithAttack[0].attackPressed,
+              playersWithAttack[1].attackPressed)
+        player0, player1 = playersWithAttack[0], playersWithAttack[1]
+        deltaScorePlayer0, deltaScorePlayer1 = player0.currentChi - attackUtils.attackChiThresholds[
+            player0.
+            attackPressed], player1.currentChi - attackUtils.attackChiThresholds[
+                player1.attackPressed]
+        print(deltaScorePlayer0, deltaScorePlayer1)
+        if deltaScorePlayer0 == deltaScorePlayer1:
+            random.shuffle(playersWithAttack)
+            return playersWithAttack
+
+        if deltaScorePlayer0 > deltaScorePlayer1:
+            return [player0, player1]
+
+        return [player1, player0]
 
     def loopScene(self, events: list[pygame.event.Event]):
         currentMusicElapsed = self._musicManager.getMusicElapsedSeconds(
@@ -99,12 +122,19 @@ class GameScene(sceneClass.Scene):
                 self._fadeOutStarted = False
                 self._stateTimer.restart()
                 for player in self._players:
-                    player.attackPressed = False
+                    player.attackPressed = attackUtils.AttackType.Rien
                 self._state = gameStates.GameState.WAIT_FOR_ATTACK
 
         elif self._state == gameStates.GameState.WAIT_FOR_ATTACK:
             if self._stateTimer.elapsed() >= 3:
-                if any([player.attackPressed for player in self._players]):
+                playersWithAttack = [
+                    player for player in self._players
+                    if player.attackPressed != attackUtils.AttackType.Rien
+                ]
+                if len(playersWithAttack) != 0:
+                    self._fightOrder = self._chooseFightOrder(
+                        playersWithAttack)
+                    print(self._fightOrder[0]._playerID)
                     self._state = gameStates.GameState.FIGHT_SCENE
                 else:
                     nextSectionID = self._currentTrackSection.ID + 1

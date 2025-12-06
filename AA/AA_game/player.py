@@ -1,6 +1,6 @@
 from __future__ import annotations
-import pygame
-from AA.AA_utils import countries, settings, score, inputManager
+import pygame, os
+from AA.AA_utils import countries, settings, score, inputManager, attackUtils, misc
 from AA.AA_game import noteSheet, musicTrack, sprite, chiBar, gameStates
 
 
@@ -14,12 +14,25 @@ class Player:
                  cpu: bool = False):
         self._name = name
         self._country = country
-        self._chi = 0
+        if playerID == 0:
+            self._totalChi = 5000
+        else:
+            self._totalChi = 5001
+        self._currentChi = self._totalChi
         self._health = 10
         self._playerID = playerID
         self._mainApp = mainApp
         self._cpu = cpu
-        self._attackPressed = False
+        self._registeredAttack = attackUtils.AttackType.Rien
+
+        self._checkMark = pygame.transform.scale(
+            pygame.image.load(
+                os.path.join(settings.PARENT_PATH, "AA_images/check.png")),
+            (100, 100))
+        self._xMark = pygame.transform.scale(
+            pygame.image.load(
+                os.path.join(settings.PARENT_PATH, "AA_images/x.png")),
+            (100, 100))
 
         self._playerHalf = pygame.Surface(
             ((mainApp.get_width() / 2) + 50, mainApp.get_height()),
@@ -32,20 +45,32 @@ class Player:
         self._sprite = sprite.Sprite(playerID, name, country, self._playerHalf)
 
     @property
-    def chi(self):
-        return self._chi
+    def currentChi(self):
+        return self._currentChi
+
+    @currentChi.setter
+    def currentChi(self, newVal: int):
+        self._currentChi = max(newVal, 0)
 
     @property
-    def attackPressed(self):
-        return self._attackPressed
+    def totalChi(self):
+        return self._totalChi
 
-    @attackPressed.setter
-    def attackPressed(self, newVal: bool):
-        self._attackPressed = newVal
+    def addChi(self, value: int):
+        if (value + self._currentChi) < 0:
+            self._totalChi -= self._currentChi
+            self._currentChi = 0
+        else:
+            self._currentChi += value
+            self._totalChi += value
 
-    @chi.setter
-    def chi(self, newValue: int):
-        self._chi = max(newValue, 0)
+    @property
+    def registeredAttack(self):
+        return self._registeredAttack
+
+    @registeredAttack.setter
+    def attackPressed(self, newVal: attackUtils.AttackType):
+        self._registeredAttack = newVal
 
     def loadSection(self, newSection: musicTrack.TrackSection):
         newSection.queueAllNotes()
@@ -57,7 +82,7 @@ class Player:
         self._trackSection = newSection
 
     def _registerNoteHit(self, hitType: score.HitType):
-        self.chi += score.hitChiScore[hitType]
+        self.addChi(score.hitChiScore[hitType])
 
     def _userHitNote(self, btnPressed: inputManager.ButtonInputs,
                      musicElapsedTime: float):
@@ -108,13 +133,23 @@ class Player:
 
             if gameState == gameStates.GameState.WAIT_FOR_ATTACK:
                 if btn == inputManager.attackBtn:
-                    self._attackPressed = True
+                    attackType = attackUtils.getAttackType(self._currentChi)
+                    if attackType != attackUtils.AttackType.Rien:
+                        self._registeredAttack = attackType
 
         self._updateNoteStatus(musicElapsedTime)
 
         self._noteSheet.update(self._trackSection, gameState)
-        self._chiBar.update(self._chi)
+        self._chiBar.update(self._currentChi, self._totalChi)
         self._sprite.update(self._health)
+
+        if gameState == gameStates.GameState.WAIT_FOR_ATTACK:
+            if self._registeredAttack == attackUtils.AttackType.Rien:
+                chosenMark = self._xMark
+            else:
+                chosenMark = self._checkMark
+            misc.placeSurfaceInHalf(self._playerID, chosenMark,
+                                    self._playerHalf, (365, 450))
 
         self._mainApp.blit(
             self._playerHalf,

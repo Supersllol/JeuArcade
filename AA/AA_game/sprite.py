@@ -23,7 +23,7 @@ class Sprite:
                  playerHalf: pygame.Surface):
         self._playerID = playerID
         self._playerHalf = playerHalf
-        self._characterMidtop = (120, 275)
+        self._characterMidtop = settings.SPRITE_BASE_POS
 
         self._character = pygame.transform.scale(
             pygame.image.load(
