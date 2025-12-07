@@ -1,8 +1,8 @@
 # TO-DO LIST
 
 ## Game Logic
-- [ ] Implement player movement mechanics
-- [ ] Create enemy AI behavior
+- [X] Implement player movement mechanics
+- [X] Create enemy AI behavior
 - [ ] Design CHI progression system
 - [ ] Develop combat system
 - [x] Display score per note
@@ -29,3 +29,7 @@
 
 ## Backend and Database
 - [ ] Set up database for storing player scores
+
+## Optimization
+- [ ] Render all images once
+- [ ] Use .convert() or .convert_alpha() on surfaces

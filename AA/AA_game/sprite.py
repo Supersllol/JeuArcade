@@ -2,18 +2,7 @@ from __future__ import annotations
 import pygame, os
 from enum import Enum
 from AA.AA_utils import misc, settings, countries, fontManager, timer
-from AA.AA_game import healthBar
-
-
-class Frame:
-
-    def __init__(self, relativePos: tuple[int, int], imageName: str):
-        self._relativePos = relativePos
-        self._imageName = imageName
-
-
-class PlayerAnimations(Enum):
-    STAND_IDLE = [Frame((0, 0), "")]
+from AA.AA_game import healthBar, animations
 
 
 class Sprite:
@@ -31,10 +20,7 @@ class Sprite:
         self._travelStep = (0, 0)
         self._travelTimer = timer.Timer()
 
-        self._character = pygame.transform.scale(
-            pygame.image.load(
-                os.path.join(settings.PARENT_PATH, "AA_images/P0-face.png")),
-            settings.SPRITE_SIZE)
+        self._currentAnimation = animations.PlayerAnimations.STAND_IDLE
 
         self._spriteSurface = pygame.Surface(
             (settings.SPRITE_SIZE[0] + 100, settings.SPRITE_SIZE[1] + 100),
@@ -44,6 +30,14 @@ class Sprite:
         self._name = fontManager.upheaval(name, 30, (255, 255, 255))
 
         self._healthBar = healthBar.HealthBar(playerID, self._spriteSurface)
+
+    @property
+    def currentAnimation(self):
+        return self._currentAnimation
+
+    @currentAnimation.setter
+    def currentAnimation(self, newVal: animations.PlayerAnimations):
+        self._currentAnimation = newVal
 
     def moveTo(self, targetMidtop: tuple[int, int], travelTime: float):
         if travelTime == 0:
@@ -76,10 +70,13 @@ class Sprite:
 
         self._spriteSurface.fill((0, 0, 0, 0))
         self._healthBar.update(health)
+
+        self._currentAnimation.value.update()
+        character = self._currentAnimation.value.getCurrentFrame()
         self._spriteSurface.blit(
-            self._character,
-            self._character.get_rect(midtop=(self._spriteSurface.get_width() /
-                                             2, 50)))
+            character,
+            character.get_rect(midtop=(self._spriteSurface.get_width() / 2,
+                                       50)))
         self._spriteSurface.blit(
             self._country,
             self._country.get_rect(
