@@ -65,8 +65,10 @@ class GameScene(sceneClass.Scene):
             ])
             self._musicManager.play(self._chosenTrack.audioFile,
                                     self._targetStart - 3, 3000)
-        for player in self._players:
-            player.loadSection(copy.deepcopy(self._currentTrackSection))
+
+            # already loaded if section 0
+            for player in self._players:
+                player.loadSection(copy.deepcopy(self._currentTrackSection))
         self._gameState = gameStates.GameState.MUSIC_COUNTDOWN
 
     def _chooseFightOrder(self, playersWithAttack: list[player.Player]):
@@ -132,14 +134,15 @@ class GameScene(sceneClass.Scene):
                 self._fadeOutStarted = False
                 self._stateTimer.restart()
                 for player in self._players:
-                    player.attackPressed = attackUtils.AttackType.Rien
+                    player.attackPressed = attackUtils.AttackType.PasChoisi
                 self._gameState = gameStates.GameState.WAIT_FOR_ATTACK
 
         elif self._gameState == gameStates.GameState.WAIT_FOR_ATTACK:
             if self._stateTimer.elapsed() >= 3:
                 playersWithAttack = [
-                    player for player in self._players
-                    if player.attackPressed != attackUtils.AttackType.Rien
+                    player for player in self._players if
+                    (player.attackPressed != attackUtils.AttackType.Rien and
+                     player.attackPressed != attackUtils.AttackType.PasChoisi)
                 ]
                 if len(playersWithAttack) != 0:
                     self._fightOrder = self._chooseFightOrder(

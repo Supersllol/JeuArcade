@@ -26,6 +26,10 @@ class TrackNote:
     def appearTimestamp(self):
         return self._appearTimestamp
 
+    @appearTimestamp.setter
+    def appearTimestamp(self, newVal: float):
+        self._appearTimestamp = newVal
+
     @property
     def sheetPos(self):
         return self._sheetPos

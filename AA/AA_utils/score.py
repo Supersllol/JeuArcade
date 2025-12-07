@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum, auto
+from AA.AA_utils import settings
 
 
 class HitType(Enum):
@@ -22,29 +23,33 @@ hitChiScore = {
 }
 
 hitTimeOffsets = {
-    -0.2: HitType.Manqué,
-    0.015: HitType.Merveilleux,
-    0.04: HitType.Parfait,
-    0.08: HitType.Bien,
-    0.15: HitType.Bon,
-    0.2: HitType.Précoce
+    HitType.Merveilleux: 0.02,
+    HitType.Parfait: 0.04,
+    HitType.Bien: 0.08,
+    HitType.Bon: 0.15,
 }
 
-sortedHitTimeOffsets = sorted(list(hitTimeOffsets.keys()))
+cpuHitTypeWeights = {
+    HitType.Manqué: 0.05,
+    HitType.Merveilleux: 0.075,
+    HitType.Parfait: 0.125,
+    HitType.Bien: 0.5,
+    HitType.Bon: 0.2,
+    HitType.Précoce: 0.05
+}
+
+sortedHitTimeOffsets = sorted(list(hitTimeOffsets.keys()),
+                              key=lambda e: hitTimeOffsets[e])
 
 
 def wasNoteMissed(beatOffset: float):
-    missedOffset = sortedHitTimeOffsets[0]
-    return beatOffset <= missedOffset
+    return beatOffset > hitTimeOffsets[HitType.Bon]
 
 
 def getHitType(beatOffset: float):
-    # print(beatOffset)
-    if abs(beatOffset) >= sortedHitTimeOffsets[-1]:
-        return HitType.Précoce
 
-    for thresholdTime in sortedHitTimeOffsets[1:-1]:
-        if abs(beatOffset) < thresholdTime:
-            return hitTimeOffsets[thresholdTime]
+    for hitType in sortedHitTimeOffsets:
+        if abs(beatOffset) < hitTimeOffsets[hitType]:
+            return hitType
 
-    return HitType.Manqué
+    return HitType.Précoce

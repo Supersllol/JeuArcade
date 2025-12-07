@@ -4,6 +4,7 @@ from enum import Enum, auto
 
 
 class AttackType(Enum):
+    PasChoisi = auto()
     Rien = auto()
     CoupPoing = auto()
     CoupPied = auto()
