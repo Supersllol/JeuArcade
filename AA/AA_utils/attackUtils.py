@@ -8,21 +8,21 @@ class AttackType(Enum):
     Rien = auto()
     CoupPoing = auto()
     CoupPied = auto()
-    Projection = auto()
+    DoubleCoupPoing = auto()
     Special = auto()
 
 
 attackDamage = {
     AttackType.CoupPoing: 1,
     AttackType.CoupPied: 3,
-    AttackType.Projection: 6,
+    AttackType.DoubleCoupPoing: 6,
     AttackType.Special: 10
 }
 
 attackChiThresholds = {
     AttackType.CoupPoing: 5000,
     AttackType.CoupPied: 10000,
-    AttackType.Projection: 17500,
+    AttackType.DoubleCoupPoing: 17500,
     AttackType.Special: 30000
 }
 
@@ -32,9 +32,9 @@ def getAttackType(chiValue: int):
         return AttackType.Rien
     elif chiValue < attackChiThresholds[AttackType.CoupPied]:
         return AttackType.CoupPoing
-    elif chiValue < attackChiThresholds[AttackType.Projection]:
+    elif chiValue < attackChiThresholds[AttackType.DoubleCoupPoing]:
         return AttackType.CoupPied
     elif chiValue < attackChiThresholds[AttackType.Special]:
-        return AttackType.Projection
+        return AttackType.DoubleCoupPoing
     else:
         return AttackType.Special

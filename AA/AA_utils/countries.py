@@ -6,11 +6,16 @@ from AA.AA_utils import settings, misc
 
 
 class CountryOptions(Enum):
-    CAN = "AA_images/CAN.png"
-    QBC = "AA_images/QBC.png"
-    TAN = "AA_images/TAN.png"
-    PNG = "AA_images/PNG.png"
-    USA = "AA_images/USA.png"
+    CAN = "AA_images/Pays/CAN.png"
+    QBC = "AA_images/Pays/QBC.png"
+    TAN = "AA_images/Pays/TAN.png"
+    PNG = "AA_images/Pays/PNG.png"
+    USA = "AA_images/Pays/USA.png"
+    COR = "AA_images/Pays/COR.png"
+    DAN = "AA_images/Pays/DAN.png"
+    IRA = "AA_images/Pays/IRA.png"
+    MAD = "AA_images/Pays/MAD.png"
+    VAT = "AA_images/Pays/VAT.png"
 
 
 def getRandomCPUCountry(playerCountry: CountryOptions) -> CountryOptions:

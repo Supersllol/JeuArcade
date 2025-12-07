@@ -31,9 +31,10 @@ def main():
     # currentScene = nameScene.NameScene(mainApp, input, music)
     # currentScene = countryScene.CountryScene(mainApp, input, music)
     # currentScene = splashScene.SplashScene(mainApp, input, music)
-    player0 = player.Player("SIM", countries.CountryOptions.PNG, 0, mainApp)
-    player1 = player.Player("MIS", countries.CountryOptions.CAN, 1, mainApp,
-                            True)
+    player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
+    player1 = player.Player(
+        "CPU", countries.getRandomCPUCountry(countries.CountryOptions.QBC), 1,
+        mainApp, True)
     currentScene = gameScene.GameScene(mainApp, input, music,
                                        musicTrack.GameTracks.SEMI_CHARMED_LIFE,
                                        (player0, player1))
