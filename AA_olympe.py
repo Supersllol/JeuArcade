@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pygame
-from AA.AA_scenes import gameScene, homeScene, splashScene
+from AA.AA_scenes import gameScene, homeScene, splashScene, nameScene, countryScene
 from AA.AA_utils import inputManager, musicManager, countries, settings
 from AA.AA_game import musicTrack, player
 
@@ -28,7 +28,9 @@ def main():
 
     # currentScene = introScene.IntroScene(mainApp, input)
     # currentScene = homeScene.HomeScene(mainApp, input, music)
-    currentScene = splashScene.SplashScene(mainApp, input, music)
+    # currentScene = nameScene.NameScene(mainApp, input, music)
+    currentScene = countryScene.CountryScene(mainApp, input, music)
+    # currentScene = splashScene.SplashScene(mainApp, input, music)
     player0 = player.Player("SIM", countries.CountryOptions.PNG, 0, mainApp)
     player1 = player.Player("MIS", countries.CountryOptions.CAN, 1, mainApp)
     # currentScene = gameScene.GameScene(mainApp, input, music,

@@ -233,7 +233,9 @@ class HomeScene(Scene):
                     self.sceneFinished = True
 
         # Draw: background + title
-        self._mainApp.blit(self.bg_image, (0, 0))
+        self._mainApp.blit(
+            self.bg_image,
+            self.bg_image.get_rect(center=self._mainApp.get_rect().center))
 
         # Use cached heartbeat title images - just get next frame
         self.title_image, vertical_bump = self._title_cache[
@@ -286,15 +288,14 @@ class HomeScene(Scene):
     def getTransition(self):
         # Default transition passthrough
         print("Transitioning to Game Scene")
-        return gameScene.GameScene(self._mainApp, self._inputManager,
-                                   self._musicManager,
-                                   musicTrack.GameTracks.SEMI_CHARMED_LIFE, (
-                                       player.Player("SIM",
-                                                     countries.CountryOptions.PNG,
-                                                     0, self._mainApp),
-                                       player.Player("MIS",
-                                                     countries.CountryOptions.CAN,
-                                                     1, self._mainApp)))
+        return gameScene.GameScene(
+            self._mainApp, self._inputManager, self._musicManager,
+            musicTrack.GameTracks.SEMI_CHARMED_LIFE,
+            (player.Player("SIM", countries.CountryOptions.PNG, 0,
+                           self._mainApp),
+             player.Player("MIS", countries.CountryOptions.CAN, 1,
+                           self._mainApp)))
+
 
 # Standalone test harness
 if __name__ == "__main__":
