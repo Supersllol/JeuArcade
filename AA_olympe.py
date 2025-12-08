@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pygame
 from AA.AA_scenes import gameScene, homeScene, splashScene, nameScene, countryScene
-from AA.AA_utils import inputManager, musicManager, countries, settings, timer
+from AA.AA_utils import inputManager, musicManager, countries, settings, timer, dbManager
 from AA.AA_game import musicTrack, player
 
 
@@ -25,19 +25,19 @@ def main():
             joysticks.append(joystick)
     input = inputManager.InputManager(joysticks)
     music = musicManager.MusicManager()
-
-    # currentScene = introScene.IntroScene(mainApp, input)
-    # currentScene = homeScene.HomeScene(mainApp, input, music)
-    # currentScene = nameScene.NameScene(mainApp, input, music)
-    # currentScene = countryScene.CountryScene(mainApp, input, music)
-    # currentScene = splashScene.SplashScene(mainApp, input, music)
+    db = dbManager.DatabaseManager()
+    # currentScene = homeScene.HomeScene(mainApp, input, music, db)
+    # currentScene = nameScene.NameScene(mainApp, input, music, db)
+    # currentScene = countryScene.CountryScene(mainApp, input, music, db)
+    # currentScene = splashScene.SplashScene(mainApp, input, music, db)
     player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
     player1 = player.Player(
-        "CPU", countries.getRandomCPUCountry(countries.CountryOptions.QBC), 1,
+        "TST", countries.getRandomCPUCountry(countries.CountryOptions.QBC), 1,
         mainApp, False)
-    currentScene = gameScene.GameScene(mainApp, input, music,
+    currentScene = gameScene.GameScene(mainApp, input, music, db,
                                        musicTrack.GameTracks.SEMI_CHARMED_LIFE,
                                        (player0, player1))
+
     ACTIF = True
     clock = pygame.time.Clock()
     mainTimer = timer.Timer()
@@ -54,6 +54,8 @@ def main():
                 if newScene:
                     newScene.initScene()
                     currentScene = newScene
+                else:
+                    ACTIF = False
 
         if mainTimer.elapsed() >= (1 / settings.FRAMERATE):
             clock.tick(settings.FRAMERATE)
@@ -61,6 +63,7 @@ def main():
             mainTimer.restart()
 
     pygame.quit()
+    db.closeConnection()
 
 
 if __name__ == "__main__":

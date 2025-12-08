@@ -3,12 +3,12 @@
 ## Game Logic
 - [X] Implement player movement mechanics
 - [X] Create enemy AI behavior
-- [ ] Design CHI progression system
 - [X] Develop combat system
 - [x] Display score per note
+- [ ] Design CHI bar and tune chi thresholds
+- [ ] Add ultimate animation
+- [ ] Add 4 dance moves animation
 
-## Art and Assets
-- [ ] Create animations
 
 ## Sound and Music
 - [ ] Implement background music track for main menu
@@ -28,7 +28,7 @@
 - [ ] Create rankings screen
 
 ## Backend and Database
-- [ ] Set up database for storing player scores
+- [X] Set up database for storing player scores
 
 ## Optimization
 - [ ] Render all images once

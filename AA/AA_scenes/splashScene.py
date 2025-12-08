@@ -14,15 +14,16 @@ if __name__ == "__main__":
         sys.path.insert(0, project_root)
 
 from AA.AA_scenes.sceneClass import Scene
-from AA.AA_utils import inputManager, musicManager, settings
+from AA.AA_utils import inputManager, musicManager, settings, dbManager
 
 
 class SplashScene(Scene):
 
     def __init__(self, mainApp: pygame.Surface,
                  inputManager: inputManager.InputManager,
-                 musicManager: musicManager.MusicManager):
-        super().__init__(mainApp, inputManager, musicManager)
+                 musicManager: musicManager.MusicManager,
+                 dbManager: dbManager.DatabaseManager):
+        super().__init__(mainApp, inputManager, musicManager, dbManager)
 
         # Asset paths
         images_dir = os.path.join(settings.PARENT_PATH, "AA_images")

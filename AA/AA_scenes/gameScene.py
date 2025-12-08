@@ -1,6 +1,6 @@
 from __future__ import annotations
 from AA.AA_scenes import sceneClass
-from AA.AA_utils import fontManager, inputManager, pygameText, musicManager, settings, attackUtils
+from AA.AA_utils import fontManager, inputManager, pygameText, musicManager, settings, attackUtils, dbManager
 from AA.AA_game import musicTrack, player, gameStates, animations
 from enum import Enum, auto
 import pygame, os, math, copy, random
@@ -11,6 +11,7 @@ class GameScene(sceneClass.Scene):
     def __init__(self, mainApp: pygame.Surface,
                  inputManager: inputManager.InputManager,
                  musicManager: musicManager.MusicManager,
+                 dbManager: dbManager.DatabaseManager,
                  track: musicTrack.GameTracks, players: tuple[player.Player,
                                                               player.Player]):
         self._players = players
@@ -35,7 +36,7 @@ class GameScene(sceneClass.Scene):
         self._winner: player.Player
         self._winReason = ""
 
-        super().__init__(mainApp, inputManager, musicManager)
+        super().__init__(mainApp, inputManager, musicManager, dbManager)
 
     def initScene(self):
         self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
@@ -374,7 +375,7 @@ class GameScene(sceneClass.Scene):
                     raison.get_rect(center=(self._mainApp.get_rect().centerx,
                                             240))))
             if self._stateTimer.elapsed() >= settings.TIMER_END:
-                # TODO: hook up to database
+
                 self._sceneFinished = True
 
         for player in self._players:
@@ -387,4 +388,9 @@ class GameScene(sceneClass.Scene):
         return super().loopScene(events)
 
     def getTransition(self):
+        if not self._winner._name == "CPU":
+            self._dbManager.addPlayerResult(self._winner, True)
+        loser = self._players[1 - self._winner._playerID]
+        if not loser._name == "CPU":
+            self._dbManager.addPlayerResult(loser, False)
         return super().getTransition()

@@ -4,7 +4,7 @@ import pygame, os
 from AA.AA_scenes import homeScene
 
 from AA.AA_scenes.sceneClass import Scene
-from AA.AA_utils import inputManager, musicManager, settings
+from AA.AA_utils import inputManager, musicManager, settings, dbManager
 from AA.AA_utils.fontManager import upheaval
 
 #Test de single VS multiplayer
@@ -15,7 +15,8 @@ class NameScene(Scene):
 
     def __init__(self, mainApp: pygame.Surface,
                  inputManager: inputManager.InputManager,
-                 musicManager: musicManager.MusicManager):
+                 musicManager: musicManager.MusicManager,
+                 dbManager: dbManager.DatabaseManager):
 
         # Asset base path
         images_dir = os.path.join(settings.PARENT_PATH, "AA_images")
@@ -26,7 +27,7 @@ class NameScene(Scene):
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                settings.WINDOW_SIZE)
 
-        super().__init__(mainApp, inputManager, musicManager)
+        super().__init__(mainApp, inputManager, musicManager, dbManager)
 
         self._icons = {
             "a":

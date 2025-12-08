@@ -18,15 +18,16 @@ from typing import List
 from AA.AA_scenes import gameScene
 from AA.AA_scenes.sceneClass import Scene
 from AA.AA_game import musicTrack, player
-from AA.AA_utils import inputManager, musicManager, settings, countries
+from AA.AA_utils import inputManager, musicManager, settings, countries, dbManager
 
 
 class HomeScene(Scene):
 
     def __init__(self, mainApp: pygame.Surface,
                  inputManager: inputManager.InputManager,
-                 musicManager: musicManager.MusicManager):
-        super().__init__(mainApp, inputManager, musicManager)
+                 musicManager: musicManager.MusicManager,
+                 dbManager: dbManager.DatabaseManager):
+        super().__init__(mainApp, inputManager, musicManager, dbManager)
 
         # Asset base path
         images_dir = os.path.join(settings.PARENT_PATH, "AA_images")
@@ -290,7 +291,7 @@ class HomeScene(Scene):
         print("Transitioning to Game Scene")
         return gameScene.GameScene(
             self._mainApp, self._inputManager, self._musicManager,
-            musicTrack.GameTracks.SEMI_CHARMED_LIFE,
+            self._dbManager, musicTrack.GameTracks.SEMI_CHARMED_LIFE,
             (player.Player("SIM", countries.CountryOptions.PNG, 0,
                            self._mainApp),
              player.Player("MIS", countries.CountryOptions.CAN, 1,
@@ -309,9 +310,10 @@ if __name__ == "__main__":
     # InputManager needs a list of joysticks (empty list defaults to keyboard)
     input_mgr = inputManager.InputManager([])  # Empty list = keyboard mode
     music_mgr = musicManager.MusicManager()  # No arguments needed
+    db = dbManager.DatabaseManager()
 
     # Create home scene
-    home_scene = HomeScene(screen, input_mgr, music_mgr)
+    home_scene = HomeScene(screen, input_mgr, music_mgr, db)
     home_scene.initScene()
 
     # Main loop

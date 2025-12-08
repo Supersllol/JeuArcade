@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pygame
 
-from AA.AA_utils import timer, inputManager, musicManager
+from AA.AA_utils import timer, inputManager, musicManager, dbManager
 
 
 # Base class representing a game scene/state.
@@ -11,7 +11,8 @@ class Scene:
 
     def __init__(self, mainApp: pygame.Surface,
                  inputManager: inputManager.InputManager,
-                 musicManager: musicManager.MusicManager):
+                 musicManager: musicManager.MusicManager,
+                 dbManager: dbManager.DatabaseManager):
         # Reference to the main drawing surface (window / screen)
         self._mainApp = mainApp
 
@@ -27,6 +28,8 @@ class Scene:
         self._inputManager = inputManager
         # Shared input manager instance (audio abstraction)
         self._musicManager = musicManager
+
+        self._dbManager = dbManager
 
     def initScene(self):
         # Called once when the scene becomes active — reset internal timer.
