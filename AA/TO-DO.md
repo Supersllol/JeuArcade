@@ -4,7 +4,7 @@
 - [X] Implement player movement mechanics
 - [X] Create enemy AI behavior
 - [ ] Design CHI progression system
-- [ ] Develop combat system
+- [X] Develop combat system
 - [x] Display score per note
 
 ## Art and Assets

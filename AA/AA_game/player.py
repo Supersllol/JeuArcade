@@ -14,7 +14,7 @@ class Player:
                  cpu: bool = False):
         self._name = name
         self._country = country
-        self._totalChi = 5000
+        self._totalChi = 0
         self._currentChi = self._totalChi
         self._health = 10
         self._playerID = playerID
@@ -22,7 +22,7 @@ class Player:
         self._cpu = cpu
         self._cpuHits: list[list[float]] = [[] for i in range(4)]
 
-        self._registeredAttack = attackUtils.AttackType.PasChoisi
+        self._savedAttack = attackUtils.AttackType.PasChoisi
 
         self._checkMark = pygame.transform.scale(
             pygame.image.load(
@@ -64,20 +64,27 @@ class Player:
             self._totalChi += value
 
     @property
-    def registeredAttack(self):
-        return self._registeredAttack
+    def savedAttack(self):
+        return self._savedAttack
 
-    @registeredAttack.setter
-    def attackPressed(self, newVal: attackUtils.AttackType):
-        self._registeredAttack = newVal
+    @savedAttack.setter
+    def savedAttack(self, newVal: attackUtils.AttackType):
+        self._savedAttack = newVal
+
+    def useAttack(self):
+        self._currentChi -= attackUtils.attackChiThresholds[self._savedAttack]
+
+    def registerEnemyAttack(self, enemyAttack: attackUtils.AttackType):
+        self._health -= attackUtils.attackDamage[enemyAttack]
 
     def moveSprite(self, targetMidtop: tuple[int, int], travelTime: float):
         self._sprite.moveTo(targetMidtop, travelTime)
 
     def changeAnimation(self,
                         newAnimation: animations.PlayerAnimations,
+                        loop: bool = False,
                         changeSides: bool = False):
-        self._sprite.setAnimation(newAnimation, changeSides)
+        self._sprite.setAnimation(newAnimation, changeSides, loop)
 
     def isAnimationFinished(self):
         return self._sprite.currentAnimation.isAnimationFinished()
@@ -192,7 +199,7 @@ class Player:
                     if btn == inputManager.attackBtn:
                         attackType = attackUtils.getAttackType(
                             self._currentChi)
-                        self._registeredAttack = attackType
+                        self._savedAttack = attackType
 
         self._updateNoteStatus(musicElapsedTime)
 
@@ -201,14 +208,13 @@ class Player:
         self._sprite.update(self._health)
 
         if gameState == gameStates.GameState.WAIT_FOR_ATTACK:
-            if self._cpu and self._registeredAttack == attackUtils.AttackType.PasChoisi:
+            if self._cpu and self._savedAttack == attackUtils.AttackType.PasChoisi:
                 if random.choice([True, False]):
                     attackType = attackUtils.getAttackType(self._currentChi)
-                    self._registeredAttack = attackType
+                    self._savedAttack = attackType
                 else:
-                    self._registeredAttack = attackUtils.AttackType.Rien
-                print(self._registeredAttack)
-            if self._registeredAttack == attackUtils.AttackType.Rien or self._registeredAttack == attackUtils.AttackType.PasChoisi:
+                    self._savedAttack = attackUtils.AttackType.Rien
+            if self._savedAttack == attackUtils.AttackType.Rien or self._savedAttack == attackUtils.AttackType.PasChoisi:
                 chosenMark = self._xMark
             else:
                 chosenMark = self._checkMark

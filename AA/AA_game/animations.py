@@ -93,6 +93,8 @@ class AnimationManager:
 class PlayerAnimations(Enum):
     STAND = auto()
     TURN_SIDE = auto()
+    TURN_FRONT = auto()
+    TURN_AROUND = auto()
     WALK = auto()
     FIGHT = auto()
     DAMAGE = auto()
@@ -100,3 +102,4 @@ class PlayerAnimations(Enum):
     PUNCH = auto()
     KICK = auto()
     DOUBLE_PUNCH = auto()
+    # ULTIMATE = auto()

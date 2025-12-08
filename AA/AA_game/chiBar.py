@@ -10,7 +10,7 @@ class ChiBar:
         self._playerHalf = playerHalf
 
         self._txtTitleChi = fontManager.upheaval("CHI", 26, (255, 255, 255))
-        self._txtTitleTotalChi = fontManager.upheaval("TOTAL CHI", 26,
+        self._txtTitleTotalChi = fontManager.upheaval("CHI TOTAL", 26,
                                                       (255, 255, 255))
         self._bar = pygame.Surface((300, 50), pygame.SRCALPHA)
 

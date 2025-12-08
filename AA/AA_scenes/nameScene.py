@@ -10,6 +10,7 @@ from AA.AA_utils.fontManager import upheaval
 #Test de single VS multiplayer
 singleplayer = False
 
+
 class NameScene(Scene):
 
     def __init__(self, mainApp: pygame.Surface,
@@ -29,17 +30,17 @@ class NameScene(Scene):
 
         self._icons = {
             "a":
-                pygame.image.load(os.path.join(icon_dir,
-                                               "Valider - A.png")).convert_alpha(),
+            pygame.image.load(os.path.join(icon_dir,
+                                           "Valider - A.png")).convert_alpha(),
             "b":
-                pygame.image.load(os.path.join(icon_dir,
-                                               "Effacer - B.png")).convert_alpha(),
+            pygame.image.load(os.path.join(icon_dir,
+                                           "Effacer - B.png")).convert_alpha(),
             "select":
-                pygame.image.load(os.path.join(
-                    icon_dir, "Quitter - Select.png")).convert_alpha(),
+            pygame.image.load(os.path.join(
+                icon_dir, "Quitter - Select.png")).convert_alpha(),
             "joystick":
-                pygame.image.load(os.path.join(
-                    icon_dir, "Déplacer - Joystick.png")).convert_alpha(),
+            pygame.image.load(os.path.join(
+                icon_dir, "Déplacer - Joystick.png")).convert_alpha(),
         }
         # Scale input icons uniformly
         for key, img in list(self._icons.items()):
@@ -47,44 +48,43 @@ class NameScene(Scene):
 
         self.img_ver = {
             "check":
-        pygame.image.load(os.path.join(
-            images_dir, "check.png")).convert_alpha(),
+            pygame.image.load(os.path.join(images_dir,
+                                           "check.png")).convert_alpha(),
             "x":
-        pygame.image.load(os.path.join(
-            images_dir, "x.png")).convert_alpha()}
+            pygame.image.load(os.path.join(images_dir,
+                                           "x.png")).convert_alpha()
+        }
 
-        self.lettres = pygame.Surface((settings.WINDOW_SIZE[0]//2,settings.WINDOW_SIZE[1]), pygame.SRCALPHA)
+        self.lettres = pygame.Surface(
+            (settings.WINDOW_SIZE[0] // 2, settings.WINDOW_SIZE[1]),
+            pygame.SRCALPHA)
         x = 73
         y = 150
         lap = 0
         for i in alpha:
             text = upheaval(i, 75, (255, 255, 255))
             if i == "M" or i == "W":
-                self.lettres.blit(text, (x-4, y))
+                self.lettres.blit(text, (x - 4, y))
             elif i == "Q":
-                self.lettres.blit(text, (x, y-3))
+                self.lettres.blit(text, (x, y - 3))
             elif i == "Y":
-                self.lettres.blit(text, (x-2, y))
+                self.lettres.blit(text, (x - 2, y))
             else:
                 self.lettres.blit(text, (x, y))
             x += 80
             lap += 1
-            if lap%5 == 0:
+            if lap % 5 == 0:
                 y += 70
                 x = 73
 
-        self.selection = pygame.image.load(os.path.join(images_dir, "selection.png")).convert_alpha()
-        self.selection_pos1 = [56,150]
-        self.selection_pos2 = [567,150]
+        self.selection = pygame.image.load(
+            os.path.join(images_dir, "selection.png")).convert_alpha()
+        self.selection_pos1 = [56, 150]
+        self.selection_pos2 = [567, 150]
 
-        self.alphabet = [
-            ["A","B","C","D","E"],
-            ["F","G","H","I","J"],
-            ["K","L","M","N","O"],
-            ["P","Q","R","S","T"],
-            ["U","V","W","X","Y"],
-            ["Z"]
-        ]
+        self.alphabet = [["A", "B", "C", "D", "E"], ["F", "G", "H", "I", "J"],
+                         ["K", "L", "M", "N", "O"], ["P", "Q", "R", "S", "T"],
+                         ["U", "V", "W", "X", "Y"], ["Z"]]
         self.y = 0
         self.x = 0
         self.nom = []
@@ -186,13 +186,13 @@ class NameScene(Scene):
 
             elif inputManager.ButtonInputs.START in new_btns:
                 if i == 0:
-                    if not self.nom == ["C","P","U"] and len(self.nom) == 3:
+                    if not self.nom == ["C", "P", "U"] and len(self.nom) == 3:
                         print(f"{self.nom[0]} {self.nom[1]} {self.nom[2]}")
                         self.ready = True
                     else:
                         print("ERREUR")
                 else:
-                    if not self.nom == ["C","P","U"] and len(self.nom) == 3:
+                    if not self.nom == ["C", "P", "U"] and len(self.nom) == 3:
                         print(f"{self.nom[0]} {self.nom[1]} {self.nom[2]}")
                         self.ready = True
                     else:
@@ -202,12 +202,15 @@ class NameScene(Scene):
             self.bg_image,
             self.bg_image.get_rect(center=self._mainApp.get_rect().center))
 
-        screen.blit(self.selection, (self.selection_pos1[0],self.selection_pos1[1]))
-        screen.blit(self.lettres, (0,0))
+        self._mainApp.blit(self.selection,
+                           (self.selection_pos1[0], self.selection_pos1[1]))
+        self._mainApp.blit(self.lettres, (0, 0))
 
         if not singleplayer:
-            screen.blit(self.selection, (self.selection_pos2[0],self.selection_pos2[1]))
-            screen.blit(self.lettres, (settings.WINDOW_SIZE[0]//2, 0))
+            self._mainApp.blit(
+                self.selection,
+                (self.selection_pos2[0], self.selection_pos2[1]))
+            self._mainApp.blit(self.lettres, (settings.WINDOW_SIZE[0] // 2, 0))
 
         # Button input instructions at bottom
         # B input
@@ -223,10 +226,8 @@ class NameScene(Scene):
                            (15, settings.WINDOW_SIZE[1] - 60))
 
         if self.ready:
-            self._mainApp.blit(self.img_ver["check"],
-                               (15, 60))
-            self._mainApp.blit(self.img_ver["x"],
-                               (600, 60))
+            self._mainApp.blit(self.img_ver["check"], (15, 60))
+            self._mainApp.blit(self.img_ver["x"], (600, 60))
 
         # Call parent loop to handle input and quitting
         return super().loopScene(events)
@@ -234,8 +235,12 @@ class NameScene(Scene):
     def getTransition(self) -> Scene | None:
         return None
 
+
 #Truc random
-alpha = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+alpha = [
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+    "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+]
 
 # Standalone test harness
 if __name__ == "__main__":

@@ -166,7 +166,7 @@ class NoteSheet:
 
     def update(self, noteSection: musicTrack.TrackSection,
                gameState: gameStates.GameState):
-        if gameState == gameStates.GameState.FIGHT_SCENE:
+        if gameState == gameStates.GameState.FIGHT_SCENE or gameState == gameStates.GameState.TIEBREAKER_DELAY or gameState == gameStates.GameState.END:
             self._mainSheet.fill((0, 0, 0, 0))
         else:
             self._mainSheet.fill((0, 0, 0, 100))

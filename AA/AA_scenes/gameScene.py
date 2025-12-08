@@ -14,6 +14,7 @@ class GameScene(sceneClass.Scene):
                  track: musicTrack.GameTracks, players: tuple[player.Player,
                                                               player.Player]):
         self._players = players
+        self._playerAttacking = players[0]
         self._bgImage = pygame.transform.scale(
             pygame.image.load(
                 os.path.join(settings.PARENT_PATH, "AA_images/dojo.jpg")),
@@ -29,12 +30,17 @@ class GameScene(sceneClass.Scene):
 
         self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
         self._fightState = gameStates.FightState.INITIAL_DELAY
+        self._fightText: list[pygameText.PygameText] = []
+
+        self._winner: player.Player
+        self._winReason = ""
 
         super().__init__(mainApp, inputManager, musicManager)
 
     def initScene(self):
-        self._gameState = gameStates.GameState.WAIT_FOR_ATTACK
-        self._currentTrackSection = self._chosenTrack.getSection(0)
+        self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
+
+        self._currentTrackSection = self._chosenTrack.getSection(3)
 
         for player in self._players:
             player.loadSection(copy.deepcopy(self._currentTrackSection))
@@ -43,14 +49,33 @@ class GameScene(sceneClass.Scene):
     def _chooseNextSection(self):
         nextSectionID = self._currentTrackSection.ID + 1
         if (nextSectionID + 1) > self._chosenTrack.nbrSections:
-            self._gameState = gameStates.GameState.END
-            print("end")
+            player0, player1 = self._players
+            if player0._health == player1._health:
+                if player0._totalChi == player1.totalChi:
+                    self._winner = random.choice(self._players)
+                    self._winReason = "CHOIX ALÉATOIRE"
+                else:
+                    if player0._totalChi > player1.totalChi:
+                        self._winner = player0
+                    else:
+                        self._winner = player1
+                    self._winReason = "PAR CHI TOTAL"
+            else:
+                if player0._health > player1._health:
+                    self._winner = player0
+                else:
+                    self._winner = player1
+                self._winReason = "PAR PV"
+
+            self._stateTimer.restart()
+            self._gameState = gameStates.GameState.TIEBREAKER_DELAY
         else:
             self._currentTrackSection = self._chosenTrack.getSection(
                 nextSectionID)
             self._stateTimer.restart()
             for player in self._players:
                 player.moveSprite(settings.SPRITE_BASE_POS, 0)
+                player.changeAnimation(animations.PlayerAnimations.STAND)
             self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
 
     def _startNextSection(self):
@@ -77,8 +102,8 @@ class GameScene(sceneClass.Scene):
         player0, player1 = playersWithAttack[0], playersWithAttack[1]
         deltaScorePlayer0, deltaScorePlayer1 = player0.currentChi - attackUtils.attackChiThresholds[
             player0.
-            attackPressed], player1.currentChi - attackUtils.attackChiThresholds[
-                player1.attackPressed]
+            savedAttack], player1.currentChi - attackUtils.attackChiThresholds[
+                player1.savedAttack]
         if deltaScorePlayer0 == deltaScorePlayer1:
             random.shuffle(playersWithAttack)
             return playersWithAttack
@@ -134,15 +159,15 @@ class GameScene(sceneClass.Scene):
                 self._fadeOutStarted = False
                 self._stateTimer.restart()
                 for player in self._players:
-                    player.attackPressed = attackUtils.AttackType.PasChoisi
+                    player.savedAttack = attackUtils.AttackType.PasChoisi
                 self._gameState = gameStates.GameState.WAIT_FOR_ATTACK
 
         elif self._gameState == gameStates.GameState.WAIT_FOR_ATTACK:
             if self._stateTimer.elapsed() >= 3:
                 playersWithAttack = [
-                    player for player in self._players if
-                    (player.attackPressed != attackUtils.AttackType.Rien and
-                     player.attackPressed != attackUtils.AttackType.PasChoisi)
+                    player for player in self._players
+                    if (player.savedAttack != attackUtils.AttackType.Rien and
+                        player.savedAttack != attackUtils.AttackType.PasChoisi)
                 ]
                 if len(playersWithAttack) != 0:
                     self._fightOrder = self._chooseFightOrder(
@@ -165,13 +190,13 @@ class GameScene(sceneClass.Scene):
                         txtCountdown,
                         txtCountdown.get_rect(
                             center=(self._mainApp.get_rect().centerx,
-                                    self._mainApp.get_rect().centery + 40))))
+                                    self._mainApp.get_rect().centery - 70))))
                 currentText.append(
                     pygameText.PygameText(
                         txtInstructions,
                         txtInstructions.get_rect(
                             center=(self._mainApp.get_rect().centerx,
-                                    self._mainApp.get_rect().centery - 40))))
+                                    self._mainApp.get_rect().centery - 150))))
 
         elif self._gameState == gameStates.GameState.FIGHT_SCENE:
             if self._fightState == gameStates.FightState.INITIAL_DELAY:
@@ -180,16 +205,16 @@ class GameScene(sceneClass.Scene):
                         player.changeAnimation(
                             animations.PlayerAnimations.TURN_SIDE)
 
-                    self._fightState = gameStates.FightState.TURN_TO_MIDDLE
+                    self._fightState = gameStates.FightState.TURN_SIDE
 
-            elif self._fightState == gameStates.FightState.TURN_TO_MIDDLE:
+            elif self._fightState == gameStates.FightState.TURN_SIDE:
                 if self._players[0].isAnimationFinished():
                     self._stateTimer.restart()
                     for player in self._players:
                         player.moveSprite(settings.SPRITE_FIGHT_POS,
                                           settings.FIGHT_TIME_TO_MIDDLE)
                         player.changeAnimation(
-                            animations.PlayerAnimations.WALK)
+                            animations.PlayerAnimations.WALK, True)
 
                     self._fightState = gameStates.FightState.MOVE_TO_MIDDLE
 
@@ -204,7 +229,153 @@ class GameScene(sceneClass.Scene):
 
             elif self._fightState == gameStates.FightState.WAIT_BEFORE_ATTACK:
                 if self._stateTimer.elapsed() >= settings.FIGHT_DELAY:
-                    self._players.index(self._fightOrder[0])
+                    self._playerAttacking = self._fightOrder[0]
+                    attackedPlayer = self._players[
+                        1 - self._playerAttacking._playerID]
+                    if self._playerAttacking.savedAttack == attackUtils.AttackType.Ultime:
+                        # TODO: change to fireball
+                        self._playerAttacking.changeAnimation(
+                            animations.PlayerAnimations.DOUBLE_PUNCH)
+                        attackedPlayer.changeAnimation(
+                            animations.PlayerAnimations.DAMAGE)
+
+                    else:
+                        if self._playerAttacking.savedAttack == attackUtils.AttackType.CoupPoing:
+                            self._playerAttacking.changeAnimation(
+                                animations.PlayerAnimations.PUNCH)
+                        elif self._playerAttacking.savedAttack == attackUtils.AttackType.CoupPied:
+                            self._playerAttacking.changeAnimation(
+                                animations.PlayerAnimations.KICK)
+                        elif self._playerAttacking.savedAttack == attackUtils.AttackType.DoubleCoupPoing:
+                            self._playerAttacking.changeAnimation(
+                                animations.PlayerAnimations.DOUBLE_PUNCH)
+                        attackedPlayer.changeAnimation(
+                            animations.PlayerAnimations.DAMAGE)
+
+                    attackName = fontManager.upheaval(
+                        self._playerAttacking.savedAttack.value, 60,
+                        (255, 255, 255))
+
+                    self._fightText.append(
+                        pygameText.PygameText(
+                            attackName,
+                            attackName.get_rect(
+                                center=(self._mainApp.get_rect().centerx,
+                                        175))))
+
+                    self._playerAttacking.useAttack()
+                    self._fightState = gameStates.FightState.ATTACK
+
+            elif self._fightState == gameStates.FightState.ATTACK:
+                if all(
+                    [player.isAnimationFinished()
+                     for player in self._players]):
+
+                    attackedPlayer = self._players[
+                        1 - self._playerAttacking._playerID]
+                    attackedPlayer.registerEnemyAttack(
+                        self._playerAttacking.savedAttack)
+
+                    attackDamage = fontManager.upheaval(
+                        f"-{attackUtils.attackDamage[self._playerAttacking.savedAttack]} PV",
+                        60, (255, 255, 255))
+                    self._fightText.append(
+                        pygameText.PygameText(
+                            attackDamage,
+                            attackDamage.get_rect(
+                                center=(self._mainApp.get_rect().centerx,
+                                        225))))
+
+                    for player in self._players:
+                        player.changeAnimation(
+                            animations.PlayerAnimations.FIGHT)
+
+                    self._stateTimer.restart()
+                    self._fightState = gameStates.FightState.WAIT_REGISTER_ATTACK
+
+            elif self._fightState == gameStates.FightState.WAIT_REGISTER_ATTACK:
+                if self._stateTimer.elapsed() >= settings.TIME_ATTACK_REGISTER:
+                    self._fightText.clear()
+
+                    self._fightOrder.pop(0)
+
+                    attackedPlayer = self._players[
+                        1 - self._playerAttacking._playerID]
+                    if attackedPlayer._health <= 0:
+                        self._stateTimer.restart()
+                        if self._playerAttacking.savedAttack != attackUtils.AttackType.Ultime:
+                            attackedPlayer.changeAnimation(
+                                animations.PlayerAnimations.DEAD)
+                        self._gameState = gameStates.GameState.END
+                        self._winReason = "PAR K.O."
+                        self._winner = self._playerAttacking
+                    elif len(self._fightOrder) == 0:
+                        for player in self._players:
+                            player.changeAnimation(
+                                animations.PlayerAnimations.TURN_AROUND)
+                        self._fightState = gameStates.FightState.TURN_AROUND
+                    else:
+                        self._stateTimer.restart()
+                        self._fightState = gameStates.FightState.WAIT_BEFORE_ATTACK
+
+            elif self._fightState == gameStates.FightState.TURN_AROUND:
+                if self._players[0].isAnimationFinished():
+                    self._stateTimer.restart()
+                    for player in self._players:
+                        player.moveSprite(settings.SPRITE_BASE_POS,
+                                          settings.FIGHT_TIME_TO_MIDDLE)
+                        player.changeAnimation(
+                            animations.PlayerAnimations.WALK, True, True)
+
+                    self._fightState = gameStates.FightState.MOVE_TO_START
+
+            elif self._fightState == gameStates.FightState.MOVE_TO_START:
+                if self._stateTimer.elapsed() >= settings.FIGHT_TIME_TO_MIDDLE:
+                    for player in self._players:
+                        player.changeAnimation(
+                            animations.PlayerAnimations.TURN_FRONT)
+
+                    self._stateTimer.restart()
+                    self._fightState = gameStates.FightState.WAIT_BEFORE_RESTART
+
+            elif self._fightState == gameStates.FightState.WAIT_BEFORE_RESTART:
+                if self._players[0].isAnimationFinished():
+                    self._chooseNextSection()
+
+            currentText = self._fightText
+
+        elif self._gameState == gameStates.GameState.TIEBREAKER_DELAY:
+            if self._stateTimer.elapsed() >= settings.TIEBREAKER_DELAY:
+                self._players[1 - self._winner._playerID].changeAnimation(
+                    animations.PlayerAnimations.DEAD)
+                self._stateTimer.restart()
+                self._gameState = gameStates.GameState.END
+
+        elif self._gameState == gameStates.GameState.END:
+            gameOver = fontManager.upheaval(f"PARTIE TERMINÉE", 100,
+                                            (255, 255, 255))
+            gagnant = fontManager.upheaval(f"GAGNANT: {self._winner._name}",
+                                           70, (255, 255, 255))
+            raison = fontManager.upheaval(f"{self._winReason}", 70,
+                                          (255, 255, 255))
+            currentText.append(
+                pygameText.PygameText(
+                    gameOver,
+                    gameOver.get_rect(center=(self._mainApp.get_rect().centerx,
+                                              110))))
+            currentText.append(
+                pygameText.PygameText(
+                    gagnant,
+                    gagnant.get_rect(center=(self._mainApp.get_rect().centerx,
+                                             190))))
+            currentText.append(
+                pygameText.PygameText(
+                    raison,
+                    raison.get_rect(center=(self._mainApp.get_rect().centerx,
+                                            240))))
+            if self._stateTimer.elapsed() >= settings.TIMER_END:
+                # TODO: hook up to database
+                self._sceneFinished = True
 
         for player in self._players:
             player.update(currentMusicElapsed, self._gameState,

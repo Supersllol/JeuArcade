@@ -38,17 +38,14 @@ class Sprite:
         return self._currentAnimation
 
     def setAnimation(self, newAnimation: animations.PlayerAnimations,
-                     changeSides: bool):
+                     changeSides: bool, loop: bool):
         playerID = self._playerID
         if changeSides:
-            if playerID == 0:
-                playerID = 1
-            else:
-                playerID = 0
+            playerID = 1 - playerID
 
         self._currentAnimation = self._animationManager.getAnimation(
             newAnimation, playerID)
-        self._currentAnimation.startAnimation(True)
+        self._currentAnimation.startAnimation(loop)
 
     def moveTo(self, targetMidtop: tuple[int, int], travelTime: float):
         if travelTime == 0:

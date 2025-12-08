@@ -34,7 +34,7 @@ def main():
     player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
     player1 = player.Player(
         "CPU", countries.getRandomCPUCountry(countries.CountryOptions.QBC), 1,
-        mainApp, True)
+        mainApp, False)
     currentScene = gameScene.GameScene(mainApp, input, music,
                                        musicTrack.GameTracks.SEMI_CHARMED_LIFE,
                                        (player0, player1))
