@@ -50,7 +50,7 @@ class GameScene(sceneClass.Scene):
                 nextSectionID)
             self._stateTimer.restart()
             for player in self._players:
-                player.sprite.moveTo(settings.SPRITE_BASE_POS, 0)
+                player.moveSprite(settings.SPRITE_BASE_POS, 0)
             self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
 
     def _startNextSection(self):
@@ -178,40 +178,38 @@ class GameScene(sceneClass.Scene):
                 if self._stateTimer.elapsed() >= settings.FIGHT_DELAY:
                     for player in self._players:
                         if player._playerID == 0:
-                            newAnim = animations.PlayerAnimations.TURN_RIGHT
+                            player.changeAnimation(
+                                animations.PlayerAnimations.TURN_RIGHT)
                         else:
-                            newAnim = animations.PlayerAnimations.TURN_LEFT
-                        player.sprite.currentAnimation = newAnim
-                        player.sprite.currentAnimation.value.startAnimation(
-                            False)
+                            player.changeAnimation(
+                                animations.PlayerAnimations.TURN_LEFT)
+
                     self._fightState = gameStates.FightState.TURN_TO_MIDDLE
 
             elif self._fightState == gameStates.FightState.TURN_TO_MIDDLE:
-                if self._players[
-                        0].sprite.currentAnimation.value.isAnimationFinished():
+                if self._players[0].isAnimationFinished():
                     self._stateTimer.restart()
                     for player in self._players:
-                        player.sprite.moveTo(settings.SPRITE_FIGHT_POS,
-                                             settings.FIGHT_TIME_TO_MIDDLE)
+                        player.moveSprite(settings.SPRITE_FIGHT_POS,
+                                          settings.FIGHT_TIME_TO_MIDDLE)
                         if player._playerID == 0:
-                            newAnim = animations.PlayerAnimations.WALK_RIGHT
+                            player.changeAnimation(
+                                animations.PlayerAnimations.WALK_RIGHT)
                         else:
-                            newAnim = animations.PlayerAnimations.WALK_LEFT
-                        player.sprite.currentAnimation = newAnim
-                        player.sprite.currentAnimation.value.startAnimation(
-                            True)
+                            player.changeAnimation(
+                                animations.PlayerAnimations.WALK_LEFT)
+
                     self._fightState = gameStates.FightState.MOVE_TO_MIDDLE
 
             elif self._fightState == gameStates.FightState.MOVE_TO_MIDDLE:
                 if self._stateTimer.elapsed() >= settings.FIGHT_TIME_TO_MIDDLE:
                     for player in self._players:
                         if player._playerID == 0:
-                            newAnim = animations.PlayerAnimations.FIGHT_RIGHT
+                            player.changeAnimation(
+                                animations.PlayerAnimations.FIGHT_RIGHT)
                         else:
-                            newAnim = animations.PlayerAnimations.FIGHT_LEFT
-                        player.sprite.currentAnimation = newAnim
-                        player.sprite.currentAnimation.value.startAnimation(
-                            False)
+                            player.changeAnimation(
+                                animations.PlayerAnimations.FIGHT_LEFT)
                     # self._chooseNextSection()
 
         for player in self._players:

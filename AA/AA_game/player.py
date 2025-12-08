@@ -1,7 +1,7 @@
 from __future__ import annotations
 import pygame, os, random
 from AA.AA_utils import countries, settings, score, inputManager, attackUtils, misc
-from AA.AA_game import noteSheet, musicTrack, sprite, chiBar, gameStates
+from AA.AA_game import noteSheet, musicTrack, sprite, chiBar, gameStates, animations
 
 
 class Player:
@@ -71,9 +71,15 @@ class Player:
     def attackPressed(self, newVal: attackUtils.AttackType):
         self._registeredAttack = newVal
 
-    @property
-    def sprite(self):
-        return self._sprite
+    def moveSprite(self, targetMidtop: tuple[int, int], travelTime: float):
+        self._sprite.moveTo(targetMidtop, travelTime)
+
+    def changeAnimation(self, newAnimation: animations.PlayerAnimations):
+        self._sprite.currentAnimation = newAnimation
+        self._sprite.currentAnimation.value.startAnimation(True)
+
+    def isAnimationFinished(self):
+        return self._sprite.currentAnimation.value.isAnimationFinished()
 
     def _generateCpuHits(self):
         for lane in self._trackSection.lanes:
