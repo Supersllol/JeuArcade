@@ -20,7 +20,9 @@ class Sprite:
         self._travelStep = (0, 0)
         self._travelTimer = timer.Timer()
 
-        self._currentAnimation = animations.PlayerAnimations.STAND_IDLE
+        self._animationManager = animations.AnimationManager()
+        self._currentAnimation = self._animationManager.getAnimation(
+            animations.PlayerAnimations.STAND, playerID)
 
         self._spriteSurface = pygame.Surface(
             (settings.SPRITE_SIZE[0] + 100, settings.SPRITE_SIZE[1] + 100),
@@ -35,9 +37,18 @@ class Sprite:
     def currentAnimation(self):
         return self._currentAnimation
 
-    @currentAnimation.setter
-    def currentAnimation(self, newVal: animations.PlayerAnimations):
-        self._currentAnimation = newVal
+    def setAnimation(self, newAnimation: animations.PlayerAnimations,
+                     changeSides: bool):
+        playerID = self._playerID
+        if changeSides:
+            if playerID == 0:
+                playerID = 1
+            else:
+                playerID = 0
+
+        self._currentAnimation = self._animationManager.getAnimation(
+            newAnimation, playerID)
+        self._currentAnimation.startAnimation(True)
 
     def moveTo(self, targetMidtop: tuple[int, int], travelTime: float):
         if travelTime == 0:
@@ -71,8 +82,8 @@ class Sprite:
         self._spriteSurface.fill((0, 0, 0, 0))
         self._healthBar.update(health)
 
-        self._currentAnimation.value.update()
-        character = self._currentAnimation.value.getCurrentFrame()
+        self._currentAnimation.update()
+        character = self._currentAnimation.getCurrentFrame()
         self._spriteSurface.blit(
             character,
             character.get_rect(midtop=(self._spriteSurface.get_width() / 2,

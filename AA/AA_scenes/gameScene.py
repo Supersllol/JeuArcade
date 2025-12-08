@@ -33,7 +33,7 @@ class GameScene(sceneClass.Scene):
         super().__init__(mainApp, inputManager, musicManager)
 
     def initScene(self):
-        self._gameState = gameStates.GameState.FIGHT_SCENE
+        self._gameState = gameStates.GameState.WAIT_FOR_ATTACK
         self._currentTrackSection = self._chosenTrack.getSection(0)
 
         for player in self._players:
@@ -177,12 +177,8 @@ class GameScene(sceneClass.Scene):
             if self._fightState == gameStates.FightState.INITIAL_DELAY:
                 if self._stateTimer.elapsed() >= settings.FIGHT_DELAY:
                     for player in self._players:
-                        if player._playerID == 0:
-                            player.changeAnimation(
-                                animations.PlayerAnimations.TURN_RIGHT)
-                        else:
-                            player.changeAnimation(
-                                animations.PlayerAnimations.TURN_LEFT)
+                        player.changeAnimation(
+                            animations.PlayerAnimations.TURN_SIDE)
 
                     self._fightState = gameStates.FightState.TURN_TO_MIDDLE
 
@@ -192,25 +188,23 @@ class GameScene(sceneClass.Scene):
                     for player in self._players:
                         player.moveSprite(settings.SPRITE_FIGHT_POS,
                                           settings.FIGHT_TIME_TO_MIDDLE)
-                        if player._playerID == 0:
-                            player.changeAnimation(
-                                animations.PlayerAnimations.WALK_RIGHT)
-                        else:
-                            player.changeAnimation(
-                                animations.PlayerAnimations.WALK_LEFT)
+                        player.changeAnimation(
+                            animations.PlayerAnimations.WALK)
 
                     self._fightState = gameStates.FightState.MOVE_TO_MIDDLE
 
             elif self._fightState == gameStates.FightState.MOVE_TO_MIDDLE:
                 if self._stateTimer.elapsed() >= settings.FIGHT_TIME_TO_MIDDLE:
                     for player in self._players:
-                        if player._playerID == 0:
-                            player.changeAnimation(
-                                animations.PlayerAnimations.FIGHT_RIGHT)
-                        else:
-                            player.changeAnimation(
-                                animations.PlayerAnimations.FIGHT_LEFT)
-                    # self._chooseNextSection()
+                        player.changeAnimation(
+                            animations.PlayerAnimations.FIGHT)
+
+                    self._stateTimer.restart()
+                    self._fightState = gameStates.FightState.WAIT_BEFORE_ATTACK
+
+            elif self._fightState == gameStates.FightState.WAIT_BEFORE_ATTACK:
+                if self._stateTimer.elapsed() >= settings.FIGHT_DELAY:
+                    self._players.index(self._fightOrder[0])
 
         for player in self._players:
             player.update(currentMusicElapsed, self._gameState,

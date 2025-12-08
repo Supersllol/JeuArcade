@@ -16,6 +16,7 @@ class FightState(Enum):
     INITIAL_DELAY = auto()
     TURN_TO_MIDDLE = auto()
     MOVE_TO_MIDDLE = auto()
+    WAIT_BEFORE_ATTACK = auto()
 
 
 statesAllowMoves = [GameState.MUSIC_COUNTDOWN, GameState.PLAY_SECTION]

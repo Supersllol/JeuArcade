@@ -14,7 +14,7 @@ class Player:
                  cpu: bool = False):
         self._name = name
         self._country = country
-        self._totalChi = 0
+        self._totalChi = 5000
         self._currentChi = self._totalChi
         self._health = 10
         self._playerID = playerID
@@ -74,12 +74,13 @@ class Player:
     def moveSprite(self, targetMidtop: tuple[int, int], travelTime: float):
         self._sprite.moveTo(targetMidtop, travelTime)
 
-    def changeAnimation(self, newAnimation: animations.PlayerAnimations):
-        self._sprite.currentAnimation = newAnimation
-        self._sprite.currentAnimation.value.startAnimation(True)
+    def changeAnimation(self,
+                        newAnimation: animations.PlayerAnimations,
+                        changeSides: bool = False):
+        self._sprite.setAnimation(newAnimation, changeSides)
 
     def isAnimationFinished(self):
-        return self._sprite.currentAnimation.value.isAnimationFinished()
+        return self._sprite.currentAnimation.isAnimationFinished()
 
     def _generateCpuHits(self):
         for lane in self._trackSection.lanes:
