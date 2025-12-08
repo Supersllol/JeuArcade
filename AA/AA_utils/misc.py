@@ -115,4 +115,4 @@ def rescaleSurface(surface: pygame.Surface, fixedCoords: tuple[None | int,
     if desiredHeight:
         return pygame.transform.smoothscale(
             surface, (int(desiredHeight * originalRatio), desiredHeight))
-    return pygame.Surface((0, 0))
+    return pygame.Surface((0, 0)).convert_alpha()

@@ -30,12 +30,12 @@ hitTimeOffsets = {
 }
 
 cpuHitTypeWeights = {
-    HitType.Manqué: 0.05,
+    HitType.Manqué: 0,
     HitType.Merveilleux: 0.075,
-    HitType.Parfait: 0.125,
-    HitType.Bien: 0.5,
-    HitType.Bon: 0.2,
-    HitType.Précoce: 0.05
+    HitType.Parfait: 0.0,
+    HitType.Bien: 0.0,
+    HitType.Bon: 0.0,
+    HitType.Précoce: 0.00
 }
 
 sortedHitTimeOffsets = sorted(list(hitTimeOffsets.keys()),

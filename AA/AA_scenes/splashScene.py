@@ -53,7 +53,7 @@ class SplashScene(Scene):
 
     def getTransition(self) -> Scene | None:
         return homeScene.HomeScene(self._mainApp, self._inputManager,
-                                   self._musicManager)
+                                   self._musicManager, self._dbManager)
 
 
 # Standalone test harness
@@ -68,9 +68,10 @@ if __name__ == "__main__":
     # InputManager needs a list of joysticks (empty list defaults to keyboard)
     input_mgr = inputManager.InputManager([])  # Empty list = keyboard mode
     music_mgr = musicManager.MusicManager()  # No arguments needed
+    db = dbManager.DatabaseManager()
 
     # Create home scene
-    splash_scene = SplashScene(screen, input_mgr, music_mgr)
+    splash_scene = SplashScene(screen, input_mgr, music_mgr, db)
     splash_scene.initScene()
 
     # Main loop

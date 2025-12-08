@@ -27,11 +27,11 @@ class Player:
         self._checkMark = pygame.transform.scale(
             pygame.image.load(
                 os.path.join(settings.PARENT_PATH, "AA_images/check.png")),
-            (100, 100))
+            (100, 100)).convert_alpha()
         self._xMark = pygame.transform.scale(
             pygame.image.load(
                 os.path.join(settings.PARENT_PATH, "AA_images/x.png")),
-            (100, 100))
+            (100, 100)).convert_alpha()
 
         self._playerHalf = pygame.Surface(
             ((mainApp.get_width() / 2) + 50, mainApp.get_height()),

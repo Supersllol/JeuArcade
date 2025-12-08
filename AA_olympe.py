@@ -9,8 +9,7 @@ from AA.AA_game import musicTrack, player
 def main():
     pygame.init()
 
-    mainApp = pygame.display.set_mode(settings.WINDOW_SIZE,
-                                      pygame.NOFRAME | pygame.SRCALPHA)
+    mainApp = pygame.display.set_mode(settings.WINDOW_SIZE, pygame.NOFRAME)
     pygame.mouse.set_visible(False)
 
     # setup joysticks
@@ -20,7 +19,7 @@ def main():
         print("Aucun joystick connecté")
     else:
         for i in range(joystickCount):
-            joystick = pygame.joystick.Joystick(0)
+            joystick = pygame.joystick.Joystick(i)
             joystick.init()
             joysticks.append(joystick)
     input = inputManager.InputManager(joysticks)
@@ -29,14 +28,14 @@ def main():
     # currentScene = homeScene.HomeScene(mainApp, input, music, db)
     # currentScene = nameScene.NameScene(mainApp, input, music, db)
     # currentScene = countryScene.CountryScene(mainApp, input, music, db)
-    # currentScene = splashScene.SplashScene(mainApp, input, music, db)
+    currentScene = splashScene.SplashScene(mainApp, input, music, db)
     player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
     player1 = player.Player(
         "TST", countries.getRandomCPUCountry(countries.CountryOptions.QBC), 1,
-        mainApp, False)
-    currentScene = gameScene.GameScene(mainApp, input, music, db,
-                                       musicTrack.GameTracks.SEMI_CHARMED_LIFE,
-                                       (player0, player1))
+        mainApp, True)
+    # currentScene = gameScene.GameScene(mainApp, input, music, db,
+    #                                    musicTrack.GameTracks.SEMI_CHARMED_LIFE,
+    #                                    (player0, player1))
 
     ACTIF = True
     clock = pygame.time.Clock()

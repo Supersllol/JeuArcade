@@ -19,8 +19,8 @@ pygame.init()
 songLength = pygame.mixer.Sound(f"{name}.mp3").get_length()
 data["songLength"] = songLength
 
-for i in range(4):
-    quartile = songLength / 4
+for i in range(6):
+    quartile = songLength / 6
     data["sections"][i] = {"start": (i) * quartile}
 
 # Fill note list

@@ -102,9 +102,9 @@ class InputManager:
         if axis == AxisInputs.X_RIGHT:
             return joystick.get_axis(0) > 0.75
         if axis == AxisInputs.Y_DOWN:
-            return joystick.get_axis(1) < -0.75
-        if axis == AxisInputs.Y_UP:
             return joystick.get_axis(1) > 0.75
+        if axis == AxisInputs.Y_UP:
+            return joystick.get_axis(1) < -0.75
 
     def update(self):
         """Poll current input state and store it as 'previous' for the next frame.

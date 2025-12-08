@@ -70,7 +70,7 @@ def loadSpriteSheet(animation: PlayerAnimations, playerID: int):
         area = (i * sheet_height, 0, sheet_height, sheet_height)
         # blit the sheet onto the frame (source = spriteSheet)
         frame.blit(spriteSheet, (0, 0), area)
-        frames.append(frame)
+        frames.append(frame.convert_alpha())
 
     return Animation(frames, animation)
 

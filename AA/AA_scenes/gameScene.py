@@ -19,7 +19,7 @@ class GameScene(sceneClass.Scene):
         self._bgImage = pygame.transform.scale(
             pygame.image.load(
                 os.path.join(settings.PARENT_PATH, "AA_images/dojo.jpg")),
-            (1100, 600))
+            (1100, 600)).convert()
 
         self._chosenTrack = musicTrack.TrackBeatMap(track)
         self._currentTrackSection: musicTrack.TrackSection
@@ -41,7 +41,7 @@ class GameScene(sceneClass.Scene):
     def initScene(self):
         self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
 
-        self._currentTrackSection = self._chosenTrack.getSection(3)
+        self._currentTrackSection = self._chosenTrack.getSection(0)
 
         for player in self._players:
             player.loadSection(copy.deepcopy(self._currentTrackSection))
