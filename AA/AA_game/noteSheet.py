@@ -6,11 +6,17 @@ from AA.AA_utils import misc, settings, timer, fontManager, inputManager, score
 from AA.AA_game import musicTrack, gameStates
 
 noteColors = {
-    0: (213, 0, 0, 255),
-    1: (0, 28, 218, 255),
-    2: (0, 211, 43, 255),
-    3: (255, 240, 0, 255)
+    0: (213, 0, 0),
+    1: (0, 28, 218),
+    2: (0, 211, 43),
+    3: (255, 240, 0)
 }
+
+noteSurfaces: dict[tuple[int, int, int], pygame.Surface] = {}
+
+deactivatedNoteSurfaces: dict[tuple[int, int, int, int], pygame.Surface] = {}
+
+noteIndicatorRings: dict[tuple[int, int, int], pygame.Surface] = {}
 
 hittableYCoord = settings.NOTE_HIT_HEIGHT - settings.NOTE_RADIUS + settings.TIME_NOTE_HITTABLE * settings.NOTE_SPEED
 
@@ -28,14 +34,13 @@ class DeactivatedNote:
         return self._timer.elapsed() < settings.DEAD_NOTE_FADEOUT
 
     def getNoteColor(self):
-        baseColor = list(noteColors[self._laneID]) if self._missed else [
-            255, 255, 255, 255
-        ]
+        baseColor = (255, 255, 255)
 
         transparency = max(
             0 + (255 * ((settings.DEAD_NOTE_FADEOUT - self._timer.elapsed()) /
                         settings.DEAD_NOTE_FADEOUT)), 0)
-        baseColor[3] = int(transparency)
+        baseColor = (baseColor[0], baseColor[1], baseColor[2],
+                     int(transparency))
         return baseColor
 
     @property
@@ -69,11 +74,12 @@ class NoteIndicator:
             buttonIndicator,
             buttonIndicator.get_rect(center=(self._coords[0],
                                              self._coords[1] - 3)))
-        misc.pixel_ring(self._mainSheet,
-                        currentColor,
-                        self._coords,
-                        settings.NOTE_RADIUS,
-                        thickness=2)
+        if currentColor not in noteIndicatorRings:
+            noteIndicatorRings[currentColor] = misc.pixel_ring(
+                currentColor, settings.NOTE_RADIUS, thickness=5)
+        self._mainSheet.blit(
+            noteIndicatorRings[currentColor],
+            noteIndicatorRings[currentColor].get_rect(center=self._coords))
 
 
 class HitTypeIndicator:
@@ -137,18 +143,23 @@ class NoteSheet:
     def _drawNotes(self, noteSection: musicTrack.TrackSection):
         for lane in noteSection.lanes:
             for note in lane.activeNotes:
-                misc.pixel_ring(self._mainSheet,
-                                noteColors[lane.laneID],
-                                note.sheetPos,
-                                settings.NOTE_RADIUS,
-                                thickness=0)
+                noteColor = noteColors[lane.laneID]
+                if noteColor not in noteSurfaces:
+                    noteSurfaces[noteColor] = misc.pixel_ring(
+                        noteColor, settings.NOTE_RADIUS, thickness=0)
+                self._mainSheet.blit(
+                    noteSurfaces[noteColor],
+                    noteSurfaces[noteColor].get_rect(center=note.sheetPos))
 
         for deactivatedNote in self._deactivatedNotes:
-            misc.pixel_ring(self._mainSheet,
-                            deactivatedNote.getNoteColor(),
-                            deactivatedNote.baseNote.sheetPos,
-                            settings.NOTE_RADIUS,
-                            thickness=0)
+            noteColor = deactivatedNote.getNoteColor()
+            if noteColor not in deactivatedNoteSurfaces:
+                deactivatedNoteSurfaces[noteColor] = misc.pixel_ring(
+                    noteColor, settings.NOTE_RADIUS, thickness=0)
+            self._mainSheet.blit(
+                deactivatedNoteSurfaces[noteColor],
+                deactivatedNoteSurfaces[noteColor].get_rect(
+                    center=deactivatedNote.baseNote.sheetPos))
 
     def getLaneCenterXPos(self, laneID: int):
         xGap = (self._mainSheet.get_width() - settings.NOTE_RADIUS * 8) / 5
