@@ -38,9 +38,9 @@ class RuleScene(Scene):
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                settings.WINDOW_SIZE)
 
-        self._icons = {}
-        for key, img in list(self._icons.items()):
-            self._icons[key] = pygame.transform.scale(img, (150, 50))
+        self._icons = pygame.image.load(os.path.join(icon_dir,
+                                                       "A -  Passer.png")).convert_alpha()
+        self._icons = pygame.transform.scale(self._icons, (225, 75))
 
         # Load scroll animation frames
         scroll_anim_dir = os.path.join(images_dir, "AA_scroll_anim")
@@ -288,6 +288,9 @@ class RuleScene(Scene):
         if self._sensei_animation_active:
             self._update_sensei_animation()
         self._draw_sensei()
+        self._mainApp.blit(self._icons,
+                           (0,
+                            settings.WINDOW_SIZE[1] - 75))
 
         return super().loopScene(events)
 

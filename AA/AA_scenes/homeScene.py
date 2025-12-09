@@ -274,13 +274,13 @@ class HomeScene(Scene):
         # Button input instructions at bottom
         # A input
         self._mainApp.blit(self._icons["joystick"],
-                           (20, settings.WINDOW_SIZE[1] - 60))
+                           (20, settings.WINDOW_SIZE[1] - 160))
         # Select input
         self._mainApp.blit(self._icons["a"],
-                           (220, settings.WINDOW_SIZE[1] - 60))
+                           (30, settings.WINDOW_SIZE[1] - 110))
         # Joystick input
         self._mainApp.blit(self._icons["select"],
-                           (420, settings.WINDOW_SIZE[1] - 60))
+                           (15, settings.WINDOW_SIZE[1] - 60))
 
         return super().loopScene(events)
 
