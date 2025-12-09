@@ -24,12 +24,10 @@ class RuleScene(Scene):
                  inputManager: inputManager.InputManager,
                  musicManager: musicManager.MusicManager,
                  dbManager: dbManager.DatabaseManager,
-                 track: musicTrack.GameTracks, players: tuple[player.Player,
-                                                              player.Player]):
+                 players: tuple[player.Player, player.Player]):
         super().__init__(mainApp, inputManager, musicManager, dbManager)
 
         # Asset base path
-        self.track = track
         self.players = players
         images_dir = os.path.join(settings.PARENT_PATH, "AA_images")
         rules_dir = os.path.join(images_dir, "AA_rules")
@@ -51,16 +49,23 @@ class RuleScene(Scene):
             frame_path = os.path.join(scroll_anim_dir, f"frame_{i:03d}.png")
             if os.path.exists(frame_path):
                 frame = pygame.image.load(frame_path).convert_alpha()
-                frame = pygame.transform.scale(frame, (settings.WINDOW_SIZE[0],settings.WINDOW_SIZE[1]*1.5))
+                frame = pygame.transform.scale(
+                    frame,
+                    (settings.WINDOW_SIZE[0], settings.WINDOW_SIZE[1] * 1.5))
                 self._scroll_frames.append(frame)
 
-        self._main_rule_image = pygame.transform.scale(pygame.image.load(os.path.join(rules_dir, "Règlement.png")).convert_alpha(), (settings.WINDOW_SIZE[0] - 500, settings.WINDOW_SIZE[1] - 100))
+        self._main_rule_image = pygame.transform.scale(
+            pygame.image.load(os.path.join(rules_dir,
+                                           "Règlement.png")).convert_alpha(),
+            (settings.WINDOW_SIZE[0] - 500, settings.WINDOW_SIZE[1] - 100))
         self._rule_images = []
         for i in range(1, 8):
             rule_path = os.path.join(rules_dir, f"{i}.png")
             if os.path.exists(rule_path):
                 rule_img = pygame.image.load(rule_path).convert_alpha()
-                rule_img = pygame.transform.scale(rule_img, (settings.WINDOW_SIZE[0] - 500, settings.WINDOW_SIZE[1] - 100))
+                rule_img = pygame.transform.scale(
+                    rule_img, (settings.WINDOW_SIZE[0] - 500,
+                               settings.WINDOW_SIZE[1] - 100))
                 self._rule_images.append(rule_img)
 
         # Scroll animation state
@@ -94,7 +99,6 @@ class RuleScene(Scene):
             self._main_rule_alpha = 0
             self._main_rule_fade_done = False
             self._stateTimer.restart()
-
 
     def loopScene(self, events: List[pygame.event.Event]):
         self._mainApp.blit(
@@ -130,7 +134,8 @@ class RuleScene(Scene):
                     self._stateTimer.restart()
 
                 if self._current_frame_index < len(self._scroll_frames):
-                    current_frame = self._scroll_frames[self._current_frame_index]
+                    current_frame = self._scroll_frames[
+                        self._current_frame_index]
                     self._mainApp.blit(current_frame, (0, -200))
                 else:
                     self._current_frame_index = len(self._scroll_frames) - 1
@@ -198,32 +203,46 @@ class RuleScene(Scene):
                             # Main rule does not fade again
                             self._stateTimer.restart()
                         else:
-                            print("All rules displayed. Transitioning to Game Scene.")
+                            print(
+                                "All rules displayed. Transitioning to Game Scene."
+                            )
                             self.sceneFinished = True
 
             if self._current_rule_index < len(self._rule_images):
                 # Create a temporary surface with alpha channel for fading
-                rule_surface = self._rule_images[self._current_rule_index].copy()
-                rule_rect = rule_surface.get_rect(center=self._mainApp.get_rect().center)
+                rule_surface = self._rule_images[
+                    self._current_rule_index].copy()
+                rule_rect = rule_surface.get_rect(
+                    center=self._mainApp.get_rect().center)
 
                 # Draw background elements
                 if self._scroll_frames:
-                    self._mainApp.blit(self._scroll_frames[self._current_frame_index], (0, -200))
+                    self._mainApp.blit(
+                        self._scroll_frames[self._current_frame_index],
+                        (0, -200))
 
                 # Draw main rule image with first-time fade-in
                 if self._main_rule_fade_done and self._main_rule_alpha >= 255:
-                    self._mainApp.blit(self._main_rule_image, (rule_rect[0], rule_rect[1] - 50))
+                    self._mainApp.blit(self._main_rule_image,
+                                       (rule_rect[0], rule_rect[1] - 50))
                 else:
-                    temp_title = pygame.Surface(self._main_rule_image.get_size(), pygame.SRCALPHA)
-                    temp_title.fill((255, 255, 255, max(0, min(255, self._main_rule_alpha))))
-                    temp_title.blit(self._main_rule_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-                    self._mainApp.blit(temp_title, (rule_rect[0], rule_rect[1] - 50))
+                    temp_title = pygame.Surface(
+                        self._main_rule_image.get_size(), pygame.SRCALPHA)
+                    temp_title.fill(
+                        (255, 255, 255, max(0, min(255,
+                                                   self._main_rule_alpha))))
+                    temp_title.blit(self._main_rule_image, (0, 0),
+                                    special_flags=pygame.BLEND_RGBA_MULT)
+                    self._mainApp.blit(temp_title,
+                                       (rule_rect[0], rule_rect[1] - 50))
 
                 # Apply alpha to rule image via per-pixel multiply (no set_alpha)
                 if self._rule_alpha < 255:
-                    temp_surface = pygame.Surface(rule_surface.get_size(), pygame.SRCALPHA)
+                    temp_surface = pygame.Surface(rule_surface.get_size(),
+                                                  pygame.SRCALPHA)
                     temp_surface.fill((255, 255, 255, self._rule_alpha))
-                    temp_surface.blit(rule_surface, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+                    temp_surface.blit(rule_surface, (0, 0),
+                                      special_flags=pygame.BLEND_RGBA_MULT)
                     self._mainApp.blit(temp_surface, rule_rect)
                 else:
                     self._mainApp.blit(rule_surface, rule_rect)
@@ -231,12 +250,10 @@ class RuleScene(Scene):
         return super().loopScene(events)
 
     def getTransition(self):
-        if self.sceneFinished:
-            print("Transitioning to Game Scene")
-            return gameScene.GameScene(self._mainApp, self._inputManager,
-                                       self._musicManager, self._dbManager, self.track,
-                                       self.players)
-        return None
+        return gameScene.GameScene(self._mainApp, self._inputManager,
+                                   self._musicManager, self._dbManager,
+                                   musicTrack.GameTracks.SEMI_CHARMED_LIFE,
+                                   self.players)
 
 
 if __name__ == "__main__":
@@ -248,11 +265,12 @@ if __name__ == "__main__":
     input_mgr = inputManager.InputManager([])
     music_mgr = musicManager.MusicManager()
     db = dbManager.DatabaseManager()
-    player = player.Player("TES", countries.CountryOptions.QBC, 0, screen)
-    cpu_player = player
+    player0 = player.Player("TES", countries.CountryOptions.QBC, 0, screen)
+    cpu_player = player0
     track = musicTrack.GameTracks.SEMI_CHARMED_LIFE
 
-    rule_scene = RuleScene(screen, input_mgr, music_mgr, db, track, (player, cpu_player))
+    rule_scene = RuleScene(screen, input_mgr, music_mgr, db,
+                           (player0, cpu_player))
     rule_scene.initScene()
 
     print("Rules Screen Test Mode")
