@@ -42,9 +42,26 @@ class Animation:
         return self._currentFrameID == len(self._frames) - 1
 
 
+def loadFromFolder(folderPath: str, animationName: PlayerAnimations):
+    frames: list[pygame.Surface] = []
+    for i in range(25):
+        frame_path = os.path.join(folderPath, f"tile{i:03d}.png")
+        print(frame_path)
+        if os.path.exists(frame_path):
+            frame = misc.rescaleSurface(pygame.image.load(frame_path),
+                                        (None, settings.SPRITE_SIZE[1]))
+            frames.append(frame)
+    print(frames)
+    return Animation(frames, animationName)
+
+
 def loadSpriteSheet(animation: PlayerAnimations, playerID: int):
     if animation == PlayerAnimations.EMPTY:
         return Animation([pygame.Surface((0, 0))], animation)
+    if animation == PlayerAnimations.HADOKEN:
+        return loadFromFolder(
+            os.path.join(settings.PARENT_PATH, "AA_images", "Animations",
+                         f"HADOKEN_{playerID}"), PlayerAnimations.HADOKEN)
     # load the sheet (get original size first to support non-square frames)
     suffix = ".png" if animation == PlayerAnimations.STAND else f"_{playerID}.png"
     name = animation.name + suffix
@@ -60,10 +77,8 @@ def loadSpriteSheet(animation: PlayerAnimations, playerID: int):
 
     # decide per-frame original width (in source pixels) for animations that aren't square
     # (HADOKEN frames are 625x300 in your assets). Add other exceptions here if needed.
-    if animation == PlayerAnimations.HADOKEN:
-        orig_frame_w = 700
-    else:
-        orig_frame_w = orig_h  # default: square frames (width == height)
+
+    orig_frame_w = orig_h  # default: square frames (width == height)
 
     # compute scaled frame width after rescale
     scale = spriteSheet.get_height() / float(orig_h) if orig_h != 0 else 1.0
