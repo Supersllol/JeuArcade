@@ -11,11 +11,15 @@ from AA.AA_utils import inputManager, musicManager, settings, dbManager, misc, f
 
 class RankingsScene(Scene):
 
-    def __init__(self, mainApp: pygame.Surface,
+    def __init__(self,
+                 mainApp: pygame.Surface,
                  inputManager: inputManager.InputManager,
                  musicManager: musicManager.MusicManager,
-                 dbManager: dbManager.DatabaseManager):
+                 dbManager: dbManager.DatabaseManager,
+                 names: tuple[str, str] = ("", "")):
         super().__init__(mainApp, inputManager, musicManager, dbManager)
+
+        self.names = names
 
         # Load background and scale to window
         self.bg_image = pygame.image.load(
@@ -40,9 +44,26 @@ class RankingsScene(Scene):
                 os.path.join(settings.PARENT_PATH, "AA_images",
                              "fond_rankings.png")), (None, 610))
 
+        self.rankings = self._dbManager.getRecordOrder()
+
     def initScene(self):
-        rankings = self._dbManager.getRecordOrder()
-        if len(rankings) == 0:
+        super().initScene()
+
+    def loopScene(self, events: list[pygame.event.Event]):
+        for i in range(2):
+            if inputManager.ButtonInputs.B in self._inputManager.getBtnsPressed(
+                    i):
+                self.sceneFinished = True
+
+        # Draw background
+        self._mainApp.blit(self.bg_image, (0, 0))
+
+        self._mainApp.blit(
+            self.rankingsBg,
+            self.rankingsBg.get_rect(center=(self._mainApp.get_rect().centerx,
+                                             410)))
+
+        if len(self.rankings) == 0:
             txt = fontManager.upheaval("Aucune donnée disponible", 40,
                                        (255, 255, 255))
             self.rankingsBg.blit(
@@ -52,6 +73,7 @@ class RankingsScene(Scene):
             colX = [160, 290, 440, 610]
             # Draw table headers
             header_y = 100
+
             header_color = (255, 204, 37)
             hdr_rank = fontManager.upheaval("RANG", 36, header_color)
             hdr_name = fontManager.upheaval("NOM", 36, header_color)
@@ -68,7 +90,7 @@ class RankingsScene(Scene):
                 hdr_score, hdr_score.get_rect(center=(colX[3], header_y)))
 
             # Prepare rows: show up to 10 players
-            rows = rankings[:10]
+            rows = self.rankings[:10]
             n_rows = 10
 
             # Vertical layout: place the first row with a top margin,
@@ -98,18 +120,27 @@ class RankingsScene(Scene):
                     rank_num = idx + 1
                     score_text = f"{record.win} - {record.lose}"
 
+                    row_color = white
+                    if record.playerName in self.names and self._stateTimer.elapsed(
+                    ) >= settings.RANKINGS_BLINK_TIME:
+                        if self._stateTimer.elapsed(
+                        ) >= 2 * settings.RANKINGS_BLINK_TIME:
+                            self._stateTimer.restart()
+                        row_color = (255, 153, 0)
+
                     # choose font sizes
                     rank_font_size = font_size.get(rank_num, default_font_size)
                     name_font_size = font_size.get(rank_num, default_font_size)
 
                     rank_font = fontManager.upheaval(str(rank_num),
-                                                     rank_font_size, white)
+                                                     rank_font_size, row_color)
                     name_font = fontManager.upheaval(record.playerName,
-                                                     name_font_size, white)
+                                                     name_font_size, row_color)
                     country_font = fontManager.upheaval(
-                        str(record.playerCountry), name_font_size, white)
+                        str(record.playerCountry), name_font_size, row_color)
                     score_font = fontManager.upheaval(score_text,
-                                                      name_font_size, white)
+                                                      name_font_size,
+                                                      row_color)
 
                     # Draw rank (left column)
                     self.rankingsBg.blit(
@@ -136,21 +167,6 @@ class RankingsScene(Scene):
                 rank_just_drawn = idx + 1
                 step = gap_after.get(rank_just_drawn, small_gap)
                 y += step
-        super().initScene()
-
-    def loopScene(self, events: list[pygame.event.Event]):
-        for i in range(2):
-            if inputManager.ButtonInputs.B in self._inputManager.getBtnsPressed(
-                    i):
-                self.sceneFinished = True
-
-        # Draw background
-        self._mainApp.blit(self.bg_image, (0, 0))
-
-        self._mainApp.blit(
-            self.rankingsBg,
-            self.rankingsBg.get_rect(center=(self._mainApp.get_rect().centerx,
-                                             410)))
 
         self._mainApp.blit(self._icons["select"],
                            (20, settings.WINDOW_SIZE[1] - 60))

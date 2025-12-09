@@ -3,7 +3,7 @@ from __future__ import annotations
 import pygame, os
 from AA.AA_scenes import homeScene
 
-from AA.AA_scenes.sceneClass import Scene
+from AA.AA_scenes import sceneClass, countryScene, homeScene
 from AA.AA_utils import inputManager, musicManager, settings, dbManager
 from AA.AA_utils.fontManager import upheaval
 
@@ -14,12 +14,12 @@ alpha = [
 ]
 
 
-class NameScene(Scene):
+class NameScene(sceneClass.Scene):
 
     def __init__(self, mainApp: pygame.Surface,
                  inputManager: inputManager.InputManager,
                  musicManager: musicManager.MusicManager,
-                 dbManager: dbManager.DatabaseManager, singlePlayer: bool):
+                 dbManager: dbManager.DatabaseManager, names: tuple[str, str]):
 
         # Asset base path
         images_dir = os.path.join(settings.PARENT_PATH, "AA_images")
@@ -101,24 +101,25 @@ class NameScene(Scene):
                          ["U", "V", "W", "X", "Y"], ["Z"]]
         self.y = 0
         self.x = 0
-        self.nom = []
+        self.nom = names[0]  # store name as a string
         self.ready = False
         self.erreur = False
         self.click = False
         self.prio = False
-        self.text = upheaval("", 75, (255, 204, 37))
+        self.text = upheaval(self.nom, 75, (255, 204, 37))
 
-        #2nd player
+        # 2nd player
         self.y2 = 0
         self.x2 = 0
-        self.nom2 = []
+        self.nom2 = names[1]  # store second player's name as a string
         self.ready2 = False
         self.erreur2 = False
         self.click2 = False
         self.prio2 = False
-        self.text2 = upheaval("", 75, (255, 204, 37))
+        self.text2 = upheaval(self.nom2, 75, (255, 204, 37))
 
-        self._singlePlayer = singlePlayer
+        self._singlePlayer = self.nom2 == "CPU"
+        self.transition = None
 
     def initScene(self):
         super().initScene()
@@ -185,49 +186,57 @@ class NameScene(Scene):
                 # Trigger action
                 if i == 0:
                     if len(self.nom) < 3:
-                        self.nom.append(self.alphabet[self.y][self.x])
+                        self.nom += self.alphabet[self.y][self.x]
                         self.erreur = False
                         self.click = True
-                        self.text = upheaval("".join(self.nom), 75,
-                                             (255, 204, 37))
+                        self.text = upheaval(self.nom, 75, (255, 204, 37))
                 else:
                     if len(self.nom2) < 3:
-                        self.nom2.append(self.alphabet[self.y2][self.x2])
+                        self.nom2 += self.alphabet[self.y2][self.x2]
                         self.erreur2 = False
                         self.click2 = True
-                        self.text2 = upheaval("".join(self.nom2), 75,
-                                              (255, 204, 37))
+                        self.text2 = upheaval(self.nom2, 75, (255, 204, 37))
 
             elif inputManager.ButtonInputs.B in new_btns:
                 # Trigger action
+                requestedExit = False
                 if i == 0:
+                    if len(self.nom) == 0:
+                        requestedExit = True
                     if len(self.nom) > 0:
-                        self.nom.pop()
+                        self.nom = self.nom[:-1]
                     self.ready = False
                     self.erreur = False
-                    self.text = upheaval("".join(self.nom), 80, (255, 204, 37))
+                    self.text = upheaval(self.nom, 80, (255, 204, 37))
                     if self.prio:
                         self.ready2 = True
                         self.prio = False
                         self.prio2 = True
                         self.erreur2 = False
                 else:
+                    if len(self.nom2) == 0:
+                        requestedExit = True
                     if len(self.nom2) > 0:
-                        self.nom2.pop()
+                        self.nom2 = self.nom2[:-1]
                     self.ready2 = False
                     self.erreur2 = False
-                    self.text2 = upheaval("".join(self.nom2), 80,
-                                          (255, 204, 37))
+                    self.text2 = upheaval(self.nom2, 80, (255, 204, 37))
                     if self.prio2:
                         self.ready = True
                         self.prio2 = False
                         self.prio = True
                         self.erreur = False
 
+                if requestedExit:
+                    self.transition = homeScene.HomeScene(
+                        self._mainApp, self._inputManager, self._musicManager,
+                        self._dbManager)
+                    self.sceneFinished = True
+
             elif inputManager.ButtonInputs.START in new_btns:
                 if i == 0:
                     self.erreur = False
-                    if not self.nom == ["C", "P", "U"] and len(self.nom) == 3:
+                    if not self.nom == "CPU" and len(self.nom) == 3:
                         if not self.ready2:
                             self.ready = True
                         else:
@@ -240,8 +249,7 @@ class NameScene(Scene):
                         self.erreur = True
                 else:
                     self.erreur2 = False
-                    if not self.nom2 == ["C", "P", "U"] and len(
-                            self.nom2) == 3:
+                    if not self.nom2 == "CPU" and len(self.nom2) == 3:
                         if not self.ready:
                             self.ready2 = True
                         else:
@@ -359,14 +367,14 @@ class NameScene(Scene):
             self.info.get_rect(center=(self._mainApp.get_rect().centerx, 60)))
 
         if self.ready:
-            if not self._singlePlayer:
-                if self.ready2:
-                    self._sceneFinished = True
-            else:
+            if self._singlePlayer or (not self._singlePlayer and self.ready2):
                 self._sceneFinished = True
+                self.transition = countryScene.CountryScene(
+                    self._mainApp, self._inputManager, self._musicManager,
+                    self._dbManager, (self.nom, self.nom2))
 
         # Call parent loop to handle input and quitting
         return super().loopScene(events)
 
-    def getTransition(self) -> Scene | None:
-        return None
+    def getTransition(self) -> sceneClass.Scene | None:
+        return self.transition

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from AA.AA_scenes import sceneClass
+from AA.AA_scenes import sceneClass, rankingsScene
 from AA.AA_utils import fontManager, inputManager, pygameText, musicManager, settings, attackUtils, dbManager
 from AA.AA_game import musicTrack, player, gameStates, animations
 from enum import Enum, auto
@@ -41,7 +41,7 @@ class GameScene(sceneClass.Scene):
     def initScene(self):
         self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
 
-        self._currentTrackSection = self._chosenTrack.getSection(0)
+        self._currentTrackSection = self._chosenTrack.getSection(4)
 
         for player in self._players:
             player.loadSection(copy.deepcopy(self._currentTrackSection))
@@ -393,4 +393,7 @@ class GameScene(sceneClass.Scene):
         loser = self._players[1 - self._winner._playerID]
         if not loser._name == "CPU":
             self._dbManager.addPlayerResult(loser, False)
-        return super().getTransition()
+
+        return rankingsScene.RankingsScene(self._mainApp, self._inputManager,
+                                           self._musicManager, self._dbManager,
+                                           (self._winner._name, loser._name))

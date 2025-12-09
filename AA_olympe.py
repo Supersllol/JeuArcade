@@ -26,15 +26,17 @@ def main():
     music = musicManager.MusicManager()
     db = dbManager.DatabaseManager()
 
-    currentScene = rankingsScene.RankingsScene(mainApp, input, music, db)
+    # currentScene = rankingsScene.RankingsScene(mainApp, input, music, db,
+    #                                            ("SIM", "GTB"))
     # currentScene = homeScene.HomeScene(mainApp, input, music, db)
-    # currentScene = nameScene.NameScene(mainApp, input, music, db, True)
+    # currentScene = nameScene.NameScene(mainApp, input, music, db,
+    #                                    ("TST", "CPU"))
     # currentScene = countryScene.CountryScene(mainApp, input, music, db,
     #                                          ("SIM", "CPU"))
-    # currentScene = splashScene.SplashScene(mainApp, input, music, db)
-    player0 = player.Player("JKM", countries.CountryOptions.QBC, 0, mainApp)
+    currentScene = splashScene.SplashScene(mainApp, input, music, db)
+    player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
     player1 = player.Player(
-        "TYH", countries.getRandomCPUCountry(countries.CountryOptions.QBC), 1,
+        "MSI", countries.getRandomCPUCountry(countries.CountryOptions.QBC), 1,
         mainApp, True)
     # currentScene = gameScene.GameScene(mainApp, input, music, db,
     #                                    musicTrack.GameTracks.SEMI_CHARMED_LIFE,
