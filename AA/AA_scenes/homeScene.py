@@ -15,10 +15,9 @@ import math
 from typing import List
 import math
 from typing import List
-from AA.AA_scenes import gameScene
+from AA.AA_scenes import nameScene, rankingsScene
 from AA.AA_scenes.sceneClass import Scene
-from AA.AA_game import musicTrack, player
-from AA.AA_utils import inputManager, musicManager, settings, countries, dbManager
+from AA.AA_utils import inputManager, musicManager, settings, dbManager
 
 
 class HomeScene(Scene):
@@ -204,13 +203,12 @@ class HomeScene(Scene):
 
     def loopScene(self, events: List[pygame.event.Event]):
 
-
         # Increment cache indices
         if self._animation_time <= self._stateTimer.elapsed():
             self._title_cache_index = (self._title_cache_index + 1) % len(
-            self._title_cache)
+                self._title_cache)
             self._glow_cache_index = (self._glow_cache_index + 1) % len(
-            self._glow_cache)
+                self._glow_cache)
             self._stateTimer.restart()
 
         # Input: navigate with up/down, confirm with A/Start
@@ -288,21 +286,19 @@ class HomeScene(Scene):
         # Default transition passthrough
         print("Transitioning to Game Scene")
         if self.selected_index == 0:
-            return gameScene.GameScene(
-                self._mainApp, self._inputManager, self._musicManager,
-                self._dbManager, musicTrack.GameTracks.SEMI_CHARMED_LIFE,
-                (player.Player("SIM", countries.CountryOptions.PNG, 0,
-                               self._mainApp),
-                 player.Player("CPU", countries.CountryOptions.CAN, 1,
-                               self._mainApp, True)))
+            return nameScene.NameScene(self._mainApp, self._inputManager,
+                                       self._musicManager, self._dbManager,
+                                       ("", "CPU"))
         elif self.selected_index == 1:
-            return gameScene.GameScene(
-                self._mainApp, self._inputManager, self._musicManager,
-                self._dbManager, musicTrack.GameTracks.SEMI_CHARMED_LIFE,
-                (player.Player("SIM", countries.CountryOptions.PNG, 0,
-                               self._mainApp),
-                 player.Player("MIS", countries.CountryOptions.CAN, 1,
-                               self._mainApp)))
+            return nameScene.NameScene(self._mainApp, self._inputManager,
+                                       self._musicManager, self._dbManager,
+                                       ("", ""))
+
+        elif self.selected_index == 2:
+            return rankingsScene.RankingsScene(self._mainApp,
+                                               self._inputManager,
+                                               self._musicManager,
+                                               self._dbManager)
         else:
             return None
 
