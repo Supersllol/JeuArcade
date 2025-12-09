@@ -101,7 +101,7 @@ class HomeScene(Scene):
         self.selected_index = 0
 
         # Vertical layout for buttons
-        self.btn_start_y = 380
+        self.btn_start_y = 360
         self.btn_spacing = 140
 
         # Animation values for selected button glow
@@ -273,13 +273,13 @@ class HomeScene(Scene):
         # Button input instructions at bottom
         # A input
         self._mainApp.blit(self._icons["joystick"],
-                           (40, settings.WINDOW_SIZE[1] - 180))
+                           (20, settings.WINDOW_SIZE[1] - 60))
         # Select input
         self._mainApp.blit(self._icons["a"],
-                           (45, settings.WINDOW_SIZE[1] - 120))
+                           (220, settings.WINDOW_SIZE[1] - 60))
         # Joystick input
         self._mainApp.blit(self._icons["select"],
-                           (30, settings.WINDOW_SIZE[1] - 60))
+                           (420, settings.WINDOW_SIZE[1] - 60))
 
         return super().loopScene(events)
 

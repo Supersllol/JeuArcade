@@ -20,16 +20,16 @@
 - [x] Sign the game with the developers name on the main menu screen
 - [ ] Insert key bindings information
   - [x] Key bingings in the main menu
-  - [ ] Key bindings in the nationality selection screen
-  - [ ] Key bindings in the name input screen
+  - [ ] Key bindings in the nationality selection screen (start, b)
+  - [ ] Key bindings in the name input screen (start, b)
   - [ ] Key bindings in the rankings screen
-- [ ] Implement nationality selection screen
-- [ ] Create name input screen
+- [X] Implement nationality selection screen
+- [X] Create name input screen
 - [ ] Create rankings screen
 
 ## Backend and Database
 - [X] Set up database for storing player scores
 
 ## Optimization
-- [ ] Render all images once
-- [ ] Use .convert() or .convert_alpha() on surfaces
+- [X] Render all images once
+- [X] Use .convert() or .convert_alpha() on surfaces

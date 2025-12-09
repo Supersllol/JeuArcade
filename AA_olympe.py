@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pygame
-from AA.AA_scenes import gameScene, homeScene, splashScene, nameScene, countryScene
+from AA.AA_scenes import gameScene, homeScene, splashScene, nameScene, countryScene, rankingsScene
 from AA.AA_utils import inputManager, musicManager, countries, settings, timer, dbManager
 from AA.AA_game import musicTrack, player
 
@@ -25,18 +25,23 @@ def main():
     input = inputManager.InputManager(joysticks)
     music = musicManager.MusicManager()
     db = dbManager.DatabaseManager()
+
+    currentScene = rankingsScene.RankingsScene(mainApp, input, music, db)
     # currentScene = homeScene.HomeScene(mainApp, input, music, db)
     # currentScene = nameScene.NameScene(mainApp, input, music, db, True)
-    currentScene = countryScene.CountryScene(mainApp, input, music, db,
-                                             ("SIM", "CPU"))
+    # currentScene = countryScene.CountryScene(mainApp, input, music, db,
+    #                                          ("SIM", "CPU"))
     # currentScene = splashScene.SplashScene(mainApp, input, music, db)
-    player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
+    player0 = player.Player("JKM", countries.CountryOptions.QBC, 0, mainApp)
     player1 = player.Player(
-        "TST", countries.getRandomCPUCountry(countries.CountryOptions.QBC), 1,
+        "TYH", countries.getRandomCPUCountry(countries.CountryOptions.QBC), 1,
         mainApp, True)
     # currentScene = gameScene.GameScene(mainApp, input, music, db,
     #                                    musicTrack.GameTracks.SEMI_CHARMED_LIFE,
     #                                    (player0, player1))
+
+    # db.addPlayerResult(player0, True)
+    # db.addPlayerResult(player1, False)
 
     ACTIF = True
     clock = pygame.time.Clock()
