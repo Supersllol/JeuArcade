@@ -22,7 +22,7 @@ class GameScene(sceneClass.Scene):
             (1100, 600)).convert()
 
         self._chosenTrack = musicTrack.TrackBeatMap(track)
-        self._currentTrackSection: musicTrack.TrackSection
+        self._currentTrackSectionID = 0
         self._targetStart = 0
 
         self._fightOrder: list[player.Player] = []
@@ -36,19 +36,25 @@ class GameScene(sceneClass.Scene):
         self._winner: player.Player
         self._winReason = ""
 
+        self._playerSections = [[
+            self._chosenTrack.getSection(j) for i in range(2)
+        ] for j in range(self._chosenTrack.nbrSections)]
+        print(self._playerSections)
+
         super().__init__(mainApp, inputManager, musicManager, dbManager)
 
     def initScene(self):
         self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
 
-        self._currentTrackSection = self._chosenTrack.getSection(4)
+        self._currentTrackSectionID = 0
 
         for player in self._players:
-            player.loadSection(copy.deepcopy(self._currentTrackSection))
+            player.loadSection(self._playerSections[
+                self._currentTrackSectionID][player._playerID])
         super().initScene()
 
     def _chooseNextSection(self):
-        nextSectionID = self._currentTrackSection.ID + 1
+        nextSectionID = self._currentTrackSectionID + 1
         if (nextSectionID + 1) > self._chosenTrack.nbrSections:
             player0, player1 = self._players
             if player0._health == player1._health:
@@ -71,8 +77,7 @@ class GameScene(sceneClass.Scene):
             self._stateTimer.restart()
             self._gameState = gameStates.GameState.TIEBREAKER_DELAY
         else:
-            self._currentTrackSection = self._chosenTrack.getSection(
-                nextSectionID)
+            self._currentTrackSectionID = nextSectionID
             self._stateTimer.restart()
             for player in self._players:
                 player.moveSprite(settings.SPRITE_BASE_POS, 0)
@@ -81,20 +86,21 @@ class GameScene(sceneClass.Scene):
 
     def _startNextSection(self):
         self._stateTimer.restart()
-        if self._currentTrackSection.ID == 0:
+        if self._currentTrackSectionID == 0:
             self._musicManager.prepareSection(0, 3)
             self._targetStart = 0
         else:
             self._targetStart = min([
-                lane.queuedNotes[0].timingTimestamp
-                for lane in self._currentTrackSection.lanes
+                lane.queuedNotes[0].timingTimestamp for lane in
+                self._playerSections[self._currentTrackSectionID][0].lanes
             ])
             self._musicManager.play(self._chosenTrack.audioFile,
                                     self._targetStart - 3, 3000)
 
             # already loaded if section 0
             for player in self._players:
-                player.loadSection(copy.deepcopy(self._currentTrackSection))
+                player.loadSection(self._playerSections[
+                    self._currentTrackSectionID][player._playerID])
         self._gameState = gameStates.GameState.MUSIC_COUNTDOWN
 
     def _chooseFightOrder(self, playersWithAttack: list[player.Player]):
@@ -130,7 +136,7 @@ class GameScene(sceneClass.Scene):
 
         elif self._gameState == gameStates.GameState.MUSIC_COUNTDOWN:
             if self._stateTimer.elapsed() >= 3:
-                if self._currentTrackSection.ID == 0:
+                if self._currentTrackSectionID == 0:
                     self._musicManager.play(self._chosenTrack.audioFile,
                                             self._targetStart)
                 self._fadeOutStarted = False
@@ -149,13 +155,16 @@ class GameScene(sceneClass.Scene):
 
         elif self._gameState == gameStates.GameState.PLAY_SECTION:
             if not self._fadeOutStarted and (
-                    currentMusicElapsed >= self._currentTrackSection.musicEnd -
-                    settings.SONG_FADE_TIME_S):
+                    currentMusicElapsed
+                    >= self._playerSections[self._currentTrackSectionID]
+                [0].musicEnd - settings.SONG_FADE_TIME_S):
                 self._fadeOutStarted = True
                 self._musicManager.fadeout(
                     int(settings.SONG_FADE_TIME_S * 1000))
 
-            if currentMusicElapsed >= self._currentTrackSection.musicEnd + settings.SECTION_SWITCH_BUFFER_TIME:
+            if currentMusicElapsed >= self._playerSections[
+                    self._currentTrackSectionID][
+                        0].musicEnd + settings.SECTION_SWITCH_BUFFER_TIME:
                 self._musicManager.stop()
                 self._fadeOutStarted = False
                 self._stateTimer.restart()

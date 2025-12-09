@@ -6,12 +6,8 @@ from AA.AA_game import noteSheet, musicTrack, sprite, chiBar, gameStates, animat
 
 class Player:
 
-    def __init__(self,
-                 name: str,
-                 country: countries.CountryOptions,
-                 playerID: int,
-                 mainApp: pygame.Surface,
-                 cpu: bool = False):
+    def __init__(self, name: str, country: countries.CountryOptions,
+                 playerID: int, mainApp: pygame.Surface):
         self._name = name
         self._country = country
         self._totalChi = 0
@@ -19,7 +15,7 @@ class Player:
         self._health = 10
         self._playerID = playerID
         self._mainApp = mainApp
-        self._cpu = cpu
+        self._cpu = name == "CPU"
         self._cpuHits: list[list[float]] = [[] for i in range(4)]
 
         self._savedAttack = attackUtils.AttackType.PasChoisi

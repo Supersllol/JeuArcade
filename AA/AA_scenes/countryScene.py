@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import pygame, os
-from AA.AA_scenes import homeScene
+from AA.AA_scenes import ruleScene
 
 from AA.AA_scenes.sceneClass import Scene
 from AA.AA_utils import inputManager, musicManager, settings, dbManager, countries, fontManager, misc
+from AA.AA_game import player
 
 flagWidth = 65
 
@@ -138,6 +139,9 @@ class CountryChooser:
             self.bgCountries.get_rect(
                 center=(self.allCountriesSurface.get_rect().centerx, 480)))
 
+    def getSelectedCountry(self):
+        return self.countryChoices[self.currentChoiceIndex]
+
     def updateIndicator(self, btns: list[inputManager.ButtonInputs],
                         axes: list[inputManager.AxisInputs]):
         if inputManager.ButtonInputs.START in btns:
@@ -261,4 +265,18 @@ class CountryScene(Scene):
         return super().loopScene(events)
 
     def getTransition(self) -> Scene | None:
-        return None
+        player0 = player.Player(self.names[0],
+                                self.countryChoosers[0].getSelectedCountry(),
+                                0, self._mainApp)
+        if not self.singlePlayer:
+            player1 = player.Player(
+                self.names[1], self.countryChoosers[1].getSelectedCountry(), 1,
+                self._mainApp)
+        else:
+            player1 = player.Player(
+                self.names[1], countries.getRandomCPUCountry(player0._country),
+                1, self._mainApp)
+
+        return ruleScene.RuleScene(self._mainApp, self._inputManager,
+                                   self._musicManager, self._dbManager,
+                                   (player0, player1))
