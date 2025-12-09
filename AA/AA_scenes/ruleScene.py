@@ -74,26 +74,14 @@ class RuleScene(Scene):
         self._rule_display_duration = 3.0
         self._rule_phase = "idle"
         self._rule_alpha = 0
-        # Main rule title fade (first time only)
-        self._main_rule_alpha = 0
-        self._main_rule_fade_done = False
 
     def _preload_cached_images(self):
         pass
 
     def initScene(self):
         super().initScene()
-        if self._scroll_frames:
-            self._animation_playing = True
-            self._current_frame_index = 0
-        else:
-            self._animation_playing = False
-            self._rule_phase = "fade_in"
-            self._current_rule_index = 0
-            self._rule_alpha = 0
-            self._main_rule_alpha = 0
-            self._main_rule_fade_done = False
-            self._stateTimer.restart()
+        self._animation_playing = True
+        self._current_frame_index = 0
 
 
     def loopScene(self, events: List[pygame.event.Event]):
@@ -103,103 +91,54 @@ class RuleScene(Scene):
 
         center_x = settings.WINDOW_SIZE[0] // 2
 
-        a_pressed = False
-        for pid in range(2):
-            presses = self._inputManager.getBtnsPressed(pid)
-            if inputManager.ButtonInputs.A in presses:
-                a_pressed = True
-                break
-
         # Handle scroll animation
         if len(self._scroll_frames) > 0 and self._animation_playing:
-            # If A pressed, skip scroll anim
-            if a_pressed:
-                self._animation_playing = False
-                self._current_frame_index = len(self._scroll_frames) - 1
+            if self._stateTimer.elapsed() >= self._scroll_frame_duration:
+                self._current_frame_index += 1
+                self._stateTimer.restart()
 
+            # Display current scroll frame
+            if self._current_frame_index < len(self._scroll_frames):
+                current_frame = self._scroll_frames[self._current_frame_index]
+                self._mainApp.blit(current_frame, (0, -200))
+            else:
+                self._current_frame_index = len(self._scroll_frames) - 1
+                self._animation_playing = False
                 self._rule_phase = "fade_in"
                 self._current_rule_index = 0
-                self._rule_alpha = 0
-
-                self._main_rule_alpha = 0
-                self._main_rule_fade_done = False
                 self._stateTimer.restart()
-            else:
-                if self._stateTimer.elapsed() >= self._scroll_frame_duration:
-                    self._current_frame_index += 1
-                    self._stateTimer.restart()
 
-                if self._current_frame_index < len(self._scroll_frames):
-                    current_frame = self._scroll_frames[self._current_frame_index]
-                    self._mainApp.blit(current_frame, (0, -200))
-                else:
-                    self._current_frame_index = len(self._scroll_frames) - 1
-                    self._animation_playing = False
-                    self._rule_phase = "fade_in"
-                    self._current_rule_index = 0
-                    # Prepare main rule first-time fade
-                    self._main_rule_alpha = 0
-                    self._main_rule_fade_done = False
-                    self._stateTimer.restart()
-
+        # Handle rule image display
         elif self._rule_phase != "idle" and len(self._rule_images) > 0:
+            elapsed = self._stateTimer.elapsed()
 
-            if a_pressed:
-                if self._rule_phase == "fade_in":
+            if self._rule_phase == "fade_in":
+                progress = min(1.0, elapsed / self._rule_fade_duration)
+                self._rule_alpha = int(255 * progress)
+
+                if progress >= 1.0:
                     self._rule_phase = "display"
-                    self._rule_alpha = 255
-                    # If main rule hasn't finished its first fade yet, complete it now
-                    if not self._main_rule_fade_done:
-                        self._main_rule_alpha = 255
-                        self._main_rule_fade_done = True
                     self._stateTimer.restart()
-                elif self._rule_phase == "display" or self._rule_phase == "fade_out":
+
+            elif self._rule_phase == "display":
+                self._rule_alpha = 255
+
+                if elapsed >= self._rule_display_duration:
+                    self._rule_phase = "fade_out"
+                    self._stateTimer.restart()
+
+            elif self._rule_phase == "fade_out":
+                progress = min(1.0, elapsed / self._rule_fade_duration)
+                self._rule_alpha = int(255 * (1.0 - progress))
+
+                if progress >= 1.0:
                     self._current_rule_index += 1
                     if self._current_rule_index < len(self._rule_images):
                         self._rule_phase = "fade_in"
-                        self._rule_alpha = 0
-                        # Do not reset main rule fade; it only fades once
                         self._stateTimer.restart()
                     else:
+                        print("All rules displayed. Transitioning to Game Scene.")
                         self.sceneFinished = True
-
-            if not a_pressed:
-                elapsed = self._stateTimer.elapsed()
-
-                if self._rule_phase == "fade_in":
-                    progress = min(1.0, elapsed / self._rule_fade_duration)
-                    self._rule_alpha = int(255 * progress)
-                    # First-time main rule fade
-                    if not self._main_rule_fade_done:
-                        self._main_rule_alpha = int(255 * progress)
-
-                    if progress >= 1.0:
-                        self._rule_phase = "display"
-                        if not self._main_rule_fade_done:
-                            self._main_rule_alpha = 255
-                            self._main_rule_fade_done = True
-                        self._stateTimer.restart()
-
-                elif self._rule_phase == "display":
-                    self._rule_alpha = 255
-                    if not self._main_rule_fade_done:
-                        self._main_rule_alpha = 255
-                        self._main_rule_fade_done = True
-
-                elif self._rule_phase == "fade_out":
-                    progress = min(1.0, elapsed / self._rule_fade_duration)
-                    self._rule_alpha = int(255 * (1.0 - progress))
-
-                    if progress >= 1.0:
-                        self._current_rule_index += 1
-                        if self._current_rule_index < len(self._rule_images):
-                            self._rule_phase = "fade_in"
-                            self._rule_alpha = 0
-                            # Main rule does not fade again
-                            self._stateTimer.restart()
-                        else:
-                            print("All rules displayed. Transitioning to Game Scene.")
-                            self.sceneFinished = True
 
             if self._current_rule_index < len(self._rule_images):
                 # Create a temporary surface with alpha channel for fading
@@ -207,25 +146,18 @@ class RuleScene(Scene):
                 rule_rect = rule_surface.get_rect(center=self._mainApp.get_rect().center)
 
                 # Draw background elements
-                if self._scroll_frames:
-                    self._mainApp.blit(self._scroll_frames[self._current_frame_index], (0, -200))
+                self._mainApp.blit(self._scroll_frames[self._current_frame_index], (0, -200))
+                self._mainApp.blit(self._main_rule_image, (rule_rect[0], rule_rect[1] - 50))
 
-                # Draw main rule image with first-time fade-in
-                if self._main_rule_fade_done and self._main_rule_alpha >= 255:
-                    self._mainApp.blit(self._main_rule_image, (rule_rect[0], rule_rect[1] - 50))
-                else:
-                    temp_title = pygame.Surface(self._main_rule_image.get_size(), pygame.SRCALPHA)
-                    temp_title.fill((255, 255, 255, max(0, min(255, self._main_rule_alpha))))
-                    temp_title.blit(self._main_rule_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-                    self._mainApp.blit(temp_title, (rule_rect[0], rule_rect[1] - 50))
-
-                # Apply alpha to rule image via per-pixel multiply (no set_alpha)
+                # Apply alpha by creating a temporary surface and using alpha as a color overlay
                 if self._rule_alpha < 255:
+                    # Create a copy with alpha applied using per-pixel alpha
                     temp_surface = pygame.Surface(rule_surface.get_size(), pygame.SRCALPHA)
                     temp_surface.fill((255, 255, 255, self._rule_alpha))
                     temp_surface.blit(rule_surface, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
                     self._mainApp.blit(temp_surface, rule_rect)
                 else:
+                    # Full opacity, just blit directly
                     self._mainApp.blit(rule_surface, rule_rect)
 
         return super().loopScene(events)
@@ -257,8 +189,7 @@ if __name__ == "__main__":
 
     print("Rules Screen Test Mode")
 
-    running = True
-    while running and not rule_scene.sceneFinished:
+    while not rule_scene.sceneFinished:
         events = pygame.event.get()
 
         for event in events:
