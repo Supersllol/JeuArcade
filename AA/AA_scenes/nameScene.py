@@ -38,7 +38,10 @@ class NameScene(sceneClass.Scene):
                                            "Valider - A.png")).convert_alpha(),
             "b":
             pygame.image.load(os.path.join(icon_dir,
-                                           "Effacer - B.png")).convert_alpha(),
+                                           "B - Retour.png")).convert_alpha(),
+            "start":
+            pygame.image.load(os.path.join(
+                icon_dir, "Start - Valider.png")).convert_alpha(),
             "select":
             pygame.image.load(os.path.join(
                 icon_dir, "Quitter - Select.png")).convert_alpha(),
@@ -48,7 +51,8 @@ class NameScene(sceneClass.Scene):
         }
         # Scale input icons uniformly
         for key, img in list(self._icons.items()):
-            self._icons[key] = pygame.transform.scale(img, (150, 50))
+            self._icons[key] = pygame.transform.scale(
+                img, (150, 50)).convert_alpha()
 
         self.img_ver = {
             "check":
@@ -119,7 +123,7 @@ class NameScene(sceneClass.Scene):
         self.text2 = upheaval(self.nom2, 75, (255, 204, 37))
 
         self._singlePlayer = self.nom2 == "CPU"
-        self.transition = None
+        self.transitionOption = None
 
     def initScene(self):
         super().initScene()
@@ -228,9 +232,7 @@ class NameScene(sceneClass.Scene):
                         self.erreur = False
 
                 if requestedExit:
-                    self.transition = homeScene.HomeScene(
-                        self._mainApp, self._inputManager, self._musicManager,
-                        self._dbManager)
+                    self.transitionOption = 1
                     self.sceneFinished = True
 
             elif inputManager.ButtonInputs.START in new_btns:
@@ -297,9 +299,8 @@ class NameScene(sceneClass.Scene):
                            (20, settings.WINDOW_SIZE[1] - 60))
         self._mainApp.blit(self._icons["a"],
                            (220, settings.WINDOW_SIZE[1] - 60))
-        # TODO
-        # self._mainApp.blit(self._icons["start"],
-        #                    (420, settings.WINDOW_SIZE[1] - 60))
+        self._mainApp.blit(self._icons["start"],
+                           (420, settings.WINDOW_SIZE[1] - 60))
         # Select input
         self._mainApp.blit(self._icons["b"],
                            (620, settings.WINDOW_SIZE[1] - 60))
@@ -369,12 +370,18 @@ class NameScene(sceneClass.Scene):
         if self.ready:
             if self._singlePlayer or (not self._singlePlayer and self.ready2):
                 self._sceneFinished = True
-                self.transition = countryScene.CountryScene(
-                    self._mainApp, self._inputManager, self._musicManager,
-                    self._dbManager, (self.nom, self.nom2))
+                self.transitionOption = 0
 
         # Call parent loop to handle input and quitting
         return super().loopScene(events)
 
     def getTransition(self) -> sceneClass.Scene | None:
-        return self.transition
+        if self.transitionOption == 0:
+            return countryScene.CountryScene(self._mainApp, self._inputManager,
+                                             self._musicManager,
+                                             self._dbManager,
+                                             (self.nom, self.nom2))
+        if self.transitionOption == 1:
+            return homeScene.HomeScene(self._mainApp, self._inputManager,
+                                       self._musicManager, self._dbManager)
+        return None

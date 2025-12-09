@@ -9,21 +9,21 @@ class AttackType(Enum):
     CoupPoing = "COUP DE POING!"
     CoupPied = "COUP DE PIED!"
     DoubleCoupPoing = "DOUBLE COUP DE POING!"
-    Ultime = "COUP ULTIME!"
+    Hadoken = "HADOKEN !"
 
 
 attackDamage = {
     AttackType.CoupPoing: 1,
     AttackType.CoupPied: 3,
     AttackType.DoubleCoupPoing: 6,
-    AttackType.Ultime: 10
+    AttackType.Hadoken: 10
 }
 
 attackChiThresholds = {
     AttackType.CoupPoing: 5000,
     AttackType.CoupPied: 10000,
     AttackType.DoubleCoupPoing: 17500,
-    AttackType.Ultime: 30000
+    AttackType.Hadoken: 30000
 }
 
 
@@ -34,7 +34,7 @@ def getAttackType(chiValue: int):
         return AttackType.CoupPoing
     elif chiValue < attackChiThresholds[AttackType.DoubleCoupPoing]:
         return AttackType.CoupPied
-    elif chiValue < attackChiThresholds[AttackType.Ultime]:
+    elif chiValue < attackChiThresholds[AttackType.Hadoken]:
         return AttackType.DoubleCoupPoing
     else:
-        return AttackType.Ultime
+        return AttackType.Hadoken

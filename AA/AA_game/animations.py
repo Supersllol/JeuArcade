@@ -43,32 +43,45 @@ class Animation:
 
 
 def loadSpriteSheet(animation: PlayerAnimations, playerID: int):
-    # load and scale the sheet to the correct height (use SPRITE_SIZE[1])
+    if animation == PlayerAnimations.EMPTY:
+        return Animation([pygame.Surface((0, 0))], animation)
+    # load the sheet (get original size first to support non-square frames)
     suffix = ".png" if animation == PlayerAnimations.STAND else f"_{playerID}.png"
     name = animation.name + suffix
     sheet_path = os.path.join(settings.PARENT_PATH, "AA_images", "Animations",
                               name)
+
     spriteSheet = pygame.image.load(sheet_path)
-    # get desired height from SPRITE_SIZE tuple
+    orig_w, orig_h = spriteSheet.get_width(), spriteSheet.get_height()
+
+    # get desired height from SPRITE_SIZE tuple and rescale the sheet
     desired_height = settings.SPRITE_SIZE[1]
     spriteSheet = misc.rescaleSurface(spriteSheet, (None, desired_height))
 
-    frames: list[pygame.Surface] = []
+    # decide per-frame original width (in source pixels) for animations that aren't square
+    # (HADOKEN frames are 625x300 in your assets). Add other exceptions here if needed.
+    if animation == PlayerAnimations.HADOKEN:
+        orig_frame_w = 700
+    else:
+        orig_frame_w = orig_h  # default: square frames (width == height)
+
+    # compute scaled frame width after rescale
+    scale = spriteSheet.get_height() / float(orig_h) if orig_h != 0 else 1.0
+    frame_w = max(1, int(round(orig_frame_w * scale)))
+
     sheet_height = spriteSheet.get_height()
     sheet_width = spriteSheet.get_width()
 
-    # number of frames (integer); if width is not multiple of height, use floor
-    n_frames = sheet_width // sheet_height
+    n_frames = sheet_width // frame_w
     if n_frames == 0:
         raise ValueError(
             f"Sprite sheet {name} is too small (width {sheet_width}, height {sheet_height})"
         )
 
+    frames: list[pygame.Surface] = []
     for i in range(n_frames):
-        # create an empty surface with alpha, blit the correct region from the sprite sheet
-        frame = pygame.Surface((sheet_height, sheet_height), pygame.SRCALPHA)
-        area = (i * sheet_height, 0, sheet_height, sheet_height)
-        # blit the sheet onto the frame (source = spriteSheet)
+        frame = pygame.Surface((frame_w, sheet_height), pygame.SRCALPHA)
+        area = (i * frame_w, 0, frame_w, sheet_height)
         frame.blit(spriteSheet, (0, 0), area)
         frames.append(frame.convert_alpha())
 
@@ -102,4 +115,5 @@ class PlayerAnimations(Enum):
     PUNCH = auto()
     KICK = auto()
     DOUBLE_PUNCH = auto()
-    # ULTIMATE = auto()
+    HADOKEN = auto()
+    EMPTY = auto()

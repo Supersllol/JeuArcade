@@ -17,8 +17,7 @@ import math
 from typing import List
 from AA.AA_scenes import nameScene, rankingsScene
 from AA.AA_scenes.sceneClass import Scene
-from AA.AA_game import musicTrack, player
-from AA.AA_utils import inputManager, musicManager, settings, countries, dbManager
+from AA.AA_utils import inputManager, musicManager, settings, dbManager
 
 
 class HomeScene(Scene):
@@ -65,6 +64,7 @@ class HomeScene(Scene):
         for key, img in list(self._icons.items()):
             self._icons[key] = pygame.transform.scale(img, (150, 50))
 
+        self._animation_time = 1 / settings.FRAMERATE  # Time per frame
         # Heartbeat animation parameters
         self._heart_time = 0.0
         self._heart_bpm = 70  # beats per minute
@@ -202,15 +202,14 @@ class HomeScene(Scene):
                                         self._heart_scale_min) * strength
 
     def loopScene(self, events: List[pygame.event.Event]):
-        # Advance animation time based on target FPS
-        self.animation_time += 1 / settings.FRAMERATE
-        self._heart_time += 1 / settings.FRAMERATE
 
         # Increment cache indices
-        self._title_cache_index = (self._title_cache_index + 1) % len(
-            self._title_cache)
-        self._glow_cache_index = (self._glow_cache_index + 1) % len(
-            self._glow_cache)
+        if self._animation_time <= self._stateTimer.elapsed():
+            self._title_cache_index = (self._title_cache_index + 1) % len(
+                self._title_cache)
+            self._glow_cache_index = (self._glow_cache_index + 1) % len(
+                self._glow_cache)
+            self._stateTimer.restart()
 
         # Input: navigate with up/down, confirm with A/Start
         for i in range(2):  # Check both players
@@ -227,6 +226,7 @@ class HomeScene(Scene):
                                                          onlyCheckForNew=True)
             if inputManager.ButtonInputs.A in new_btns:
                 # Trigger action
+                print(f"Selected: {self.btn_names[self.selected_index]}")
                 self.sceneFinished = True
 
         # Draw: background + title
@@ -272,23 +272,23 @@ class HomeScene(Scene):
         # Button input instructions at bottom
         # A input
         self._mainApp.blit(self._icons["joystick"],
-                           (20, settings.WINDOW_SIZE[1] - 60))
+                           (20, settings.WINDOW_SIZE[1] - 160))
         # Select input
         self._mainApp.blit(self._icons["a"],
-                           (220, settings.WINDOW_SIZE[1] - 60))
+                           (30, settings.WINDOW_SIZE[1] - 110))
         # Joystick input
         self._mainApp.blit(self._icons["select"],
-                           (420, settings.WINDOW_SIZE[1] - 60))
+                           (15, settings.WINDOW_SIZE[1] - 60))
 
         return super().loopScene(events)
 
     def getTransition(self):
         # Default transition passthrough
+        print("Transitioning to Game Scene")
         if self.selected_index == 0:
             return nameScene.NameScene(self._mainApp, self._inputManager,
                                        self._musicManager, self._dbManager,
                                        ("", "CPU"))
-
         elif self.selected_index == 1:
             return nameScene.NameScene(self._mainApp, self._inputManager,
                                        self._musicManager, self._dbManager,

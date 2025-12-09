@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pygame, os
-from AA.AA_scenes import ruleScene
+from AA.AA_scenes import ruleScene, nameScene
 
 from AA.AA_scenes.sceneClass import Scene
 from AA.AA_utils import inputManager, musicManager, settings, dbManager, countries, fontManager, misc
@@ -16,6 +16,7 @@ class CountryChooser:
                  bgNom: pygame.Surface):
         self.playerName = playerName
         self.validated = False
+        self.askForExit = False
 
         self.allCountriesSurface = pygame.Surface(
             (settings.WINDOW_SIZE[0] // 2, settings.WINDOW_SIZE[1]),
@@ -148,6 +149,8 @@ class CountryChooser:
             self.validated = True
             self.currentIndicator = self.validationIndicator
         if inputManager.ButtonInputs.B in btns:
+            if not self.validated:
+                self.askForExit = True
             self.validated = False
             self.currentIndicator = self.selectionIndicator
 
@@ -187,7 +190,10 @@ class CountryScene(Scene):
         self._icons = {
             "b":
             pygame.image.load(os.path.join(icon_dir,
-                                           "Effacer - B.png")).convert_alpha(),
+                                           "B - retour.png")).convert_alpha(),
+            "start":
+            pygame.image.load(os.path.join(
+                icon_dir, "Start - Valider.png")).convert_alpha(),
             "select":
             pygame.image.load(os.path.join(
                 icon_dir, "Quitter - Select.png")).convert_alpha(),
@@ -208,10 +214,15 @@ class CountryScene(Scene):
             for i in range(1 + int(not self.singlePlayer))
         ]
 
+        self.transitionOption = 0
+
         super().__init__(mainApp, inputManager, musicManager, dbManager)
 
     def initScene(self):
         super().initScene()
+
+    def returnToPreviousScreen(self):
+        pass
 
     def loopScene(self, events: list[pygame.event.Event]):
         self._mainApp.blit(
@@ -223,11 +234,15 @@ class CountryScene(Scene):
             self.countryChoosers[i].updateIndicator(
                 self._inputManager.getBtnsPressed(i),
                 self._inputManager.getAxesActive(i))
+            if self.countryChoosers[i].askForExit:
+                self.sceneFinished = True
+                self.transitionOption = 1
             self._mainApp.blit(self.countryChoosers[i].allCountriesSurface,
                                (i * self._mainApp.get_width() // 2, 0))
 
         if all([chooser.validated for chooser in self.countryChoosers]):
             self._sceneFinished = True
+            self.transitionOption = 0
 
         if self.singlePlayer:
             self._mainApp.blit(
@@ -251,9 +266,8 @@ class CountryScene(Scene):
         self._mainApp.blit(self._icons["joystick"],
                            (20, settings.WINDOW_SIZE[1] - 60))
 
-        # TODO
-        # self._mainApp.blit(self._icons["start"],
-        #                    (220, settings.WINDOW_SIZE[1] - 60))
+        self._mainApp.blit(self._icons["start"],
+                           (220, settings.WINDOW_SIZE[1] - 60))
 
         self._mainApp.blit(self._icons["b"],
                            (420, settings.WINDOW_SIZE[1] - 60))
@@ -265,18 +279,25 @@ class CountryScene(Scene):
         return super().loopScene(events)
 
     def getTransition(self) -> Scene | None:
-        player0 = player.Player(self.names[0],
-                                self.countryChoosers[0].getSelectedCountry(),
-                                0, self._mainApp)
-        if not self.singlePlayer:
-            player1 = player.Player(
-                self.names[1], self.countryChoosers[1].getSelectedCountry(), 1,
+        if self.transitionOption == 0:
+            player0 = player.Player(
+                self.names[0], self.countryChoosers[0].getSelectedCountry(), 0,
                 self._mainApp)
-        else:
-            player1 = player.Player(
-                self.names[1], countries.getRandomCPUCountry(player0._country),
-                1, self._mainApp)
-
-        return ruleScene.RuleScene(self._mainApp, self._inputManager,
-                                   self._musicManager, self._dbManager,
-                                   (player0, player1))
+            if not self.singlePlayer:
+                player1 = player.Player(
+                    self.names[1],
+                    self.countryChoosers[1].getSelectedCountry(), 1,
+                    self._mainApp)
+            else:
+                player1 = player.Player(
+                    self.names[1],
+                    countries.getRandomCPUCountry(player0._country), 1,
+                    self._mainApp)
+            return ruleScene.RuleScene(self._mainApp, self._inputManager,
+                                       self._musicManager, self._dbManager,
+                                       (player0, player1))
+        if self.transitionOption == 1:
+            return nameScene.NameScene(self._mainApp, self._inputManager,
+                                       self._musicManager, self._dbManager,
+                                       self.names)
+        return None

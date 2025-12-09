@@ -5,9 +5,8 @@ from AA.AA_utils import misc
 
 class HealthBar:
 
-    def __init__(self, playerID: int, spriteSurface: pygame.Surface):
+    def __init__(self, playerID: int):
         self._playerID = playerID
-        self._spriteSurface = spriteSurface
 
         self._bar = pygame.Surface((150, 30), pygame.SRCALPHA)
 
@@ -46,10 +45,9 @@ class HealthBar:
         pygame.draw.rect(self._bar, (0, 0, 0), (0, 0, bar_width, bar_height),
                          2)
 
-    def update(self, health: int):
+    def update(self, health: int, spriteSurface: pygame.Surface):
         self._drawHealthBars(health)
 
-        self._spriteSurface.blit(
+        spriteSurface.blit(
             self._bar,
-            self._bar.get_rect(midtop=(self._spriteSurface.get_width() / 2,
-                                       0)))
+            self._bar.get_rect(midtop=(spriteSurface.get_width() / 2, 0)))

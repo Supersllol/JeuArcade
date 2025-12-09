@@ -33,6 +33,11 @@ class RankingsScene(Scene):
             pygame.image.load(
                 os.path.join(settings.PARENT_PATH, "AA_images",
                              "AA_input_instruction", "Quitter - Select.png")),
+            "b":
+            pygame.image.load(
+                os.path.join(settings.PARENT_PATH, "AA_images",
+                             "AA_input_instruction",
+                             "B - Retour.png")).convert_alpha(),
         }
         # Scale input icons uniformly
         for key, img in list(self._icons.items()):
@@ -170,6 +175,8 @@ class RankingsScene(Scene):
 
         self._mainApp.blit(self._icons["select"],
                            (20, settings.WINDOW_SIZE[1] - 60))
+        self._mainApp.blit(self._icons["b"],
+                           (220, settings.WINDOW_SIZE[1] - 60))
 
         titre = fontManager.upheaval("record mondial", 75, (255, 204, 37))
         self._mainApp.blit(

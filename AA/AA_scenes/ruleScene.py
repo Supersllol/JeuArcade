@@ -15,7 +15,7 @@ from typing import List
 from AA.AA_scenes import gameScene
 from AA.AA_scenes.sceneClass import Scene
 from AA.AA_game import musicTrack, player
-from AA.AA_utils import inputManager, musicManager, settings, countries, dbManager
+from AA.AA_utils import inputManager, musicManager, settings, countries, dbManager, timer
 
 
 class RuleScene(Scene):
@@ -38,9 +38,9 @@ class RuleScene(Scene):
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                settings.WINDOW_SIZE)
 
-        self._icons = {}
-        for key, img in list(self._icons.items()):
-            self._icons[key] = pygame.transform.scale(img, (150, 50))
+        self._icons = pygame.image.load(os.path.join(icon_dir,
+                                                       "A -  Passer.png")).convert_alpha()
+        self._icons = pygame.transform.scale(self._icons, (225, 75))
 
         # Load scroll animation frames
         scroll_anim_dir = os.path.join(images_dir, "AA_scroll_anim")
@@ -53,6 +53,15 @@ class RuleScene(Scene):
                     frame,
                     (settings.WINDOW_SIZE[0], settings.WINDOW_SIZE[1] * 1.5))
                 self._scroll_frames.append(frame)
+
+        # Load sensei animation frames
+        sensei_anim_dir = os.path.join(images_dir, "sensei_anim")
+        self._sensei_frames = []
+        for i in range(3):
+            frame_path = os.path.join(sensei_anim_dir, f"tile00{i}.png")
+            if os.path.exists(frame_path):
+                frame = pygame.image.load(frame_path).convert_alpha()
+                self._sensei_frames.append(frame)
 
         self._main_rule_image = pygame.transform.scale(
             pygame.image.load(os.path.join(rules_dir,
@@ -70,7 +79,7 @@ class RuleScene(Scene):
 
         # Scroll animation state
         self._current_frame_index = 0
-        self._scroll_frame_duration = 0.08  # 80ms per frame
+        self._scroll_frame_duration = 0.06  # 80ms per frame
         self._animation_playing = False
 
         # Rule display state
@@ -83,8 +92,29 @@ class RuleScene(Scene):
         self._main_rule_alpha = 0
         self._main_rule_fade_done = False
 
+        # Sensei animation state
+        self._sensei_current_frame = 0
+        self._sensei_frame_duration = 0.15  # 200ms per frame
+        self._sensei_animation_active = False
+        self._sensei_timer = timer.Timer()
+
     def _preload_cached_images(self):
         pass
+
+    def _update_sensei_animation(self):
+        """Update sensei animation frame if active"""
+        if self._sensei_animation_active and self._sensei_frames:
+            if self._sensei_timer.elapsed() >= self._sensei_frame_duration:
+                self._sensei_current_frame = (self._sensei_current_frame + 1) % len(self._sensei_frames)
+                self._sensei_timer.restart()
+    def _draw_sensei(self):
+        if self._sensei_frames:
+            frame = self._sensei_frames[self._sensei_current_frame]
+            # Position in bottom right with some padding
+            rect = frame.get_rect(
+                bottomright=(settings.WINDOW_SIZE[0] + 100, 
+                           settings.WINDOW_SIZE[1] + 70))
+            self._mainApp.blit(frame, rect)
 
     def initScene(self):
         super().initScene()
@@ -98,7 +128,11 @@ class RuleScene(Scene):
             self._rule_alpha = 0
             self._main_rule_alpha = 0
             self._main_rule_fade_done = False
-            self._stateTimer.restart()
+        
+        # Initialize sensei animation
+        self._sensei_current_frame = 0
+        self._sensei_animation_active = False
+        self._stateTimer.restart()
 
     def loopScene(self, events: List[pygame.event.Event]):
         self._mainApp.blit(
@@ -127,6 +161,8 @@ class RuleScene(Scene):
 
                 self._main_rule_alpha = 0
                 self._main_rule_fade_done = False
+                self._sensei_animation_active = True
+                self._sensei_timer.restart()
                 self._stateTimer.restart()
             else:
                 if self._stateTimer.elapsed() >= self._scroll_frame_duration:
@@ -145,6 +181,8 @@ class RuleScene(Scene):
                     # Prepare main rule first-time fade
                     self._main_rule_alpha = 0
                     self._main_rule_fade_done = False
+                    self._sensei_animation_active = True
+                    self._sensei_timer.restart()
                     self._stateTimer.restart()
 
         elif self._rule_phase != "idle" and len(self._rule_images) > 0:
@@ -246,6 +284,13 @@ class RuleScene(Scene):
                     self._mainApp.blit(temp_surface, rule_rect)
                 else:
                     self._mainApp.blit(rule_surface, rule_rect)
+
+        if self._sensei_animation_active:
+            self._update_sensei_animation()
+        self._draw_sensei()
+        self._mainApp.blit(self._icons,
+                           (0,
+                            settings.WINDOW_SIZE[1] - 75))
 
         return super().loopScene(events)
 

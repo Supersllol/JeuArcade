@@ -25,13 +25,13 @@ class Sprite:
             animations.PlayerAnimations.STAND, playerID)
 
         self._spriteSurface = pygame.Surface(
-            (settings.SPRITE_SIZE[0] + 100, settings.SPRITE_SIZE[1] + 100),
+            (settings.SPRITE_SIZE[0], settings.SPRITE_SIZE[1] + 100),
             pygame.SRCALPHA)
 
         self._country = countries.getCountryFlagSurface(country)
         self._name = fontManager.upheaval(name, 30, (255, 255, 255))
 
-        self._healthBar = healthBar.HealthBar(playerID, self._spriteSurface)
+        self._healthBar = healthBar.HealthBar(playerID)
 
     @property
     def currentAnimation(self):
@@ -46,6 +46,13 @@ class Sprite:
         self._currentAnimation = self._animationManager.getAnimation(
             newAnimation, playerID)
         self._currentAnimation.startAnimation(loop)
+
+        first_frame = self._currentAnimation.getCurrentFrame()
+        frame_w, frame_h = first_frame.get_size()
+        pad_w, pad_h = 50, 100  # tweak if you want more/less margin
+        new_w = max(frame_w + pad_w, settings.SPRITE_SIZE[0])
+        new_h = max(frame_h + pad_h, settings.SPRITE_SIZE[1] + 100)
+        self._spriteSurface = pygame.Surface((new_w, new_h), pygame.SRCALPHA)
 
     def moveTo(self, targetMidtop: tuple[int, int], travelTime: float):
         if travelTime == 0:
@@ -77,14 +84,15 @@ class Sprite:
             self._updateTravel()
 
         self._spriteSurface.fill((0, 0, 0, 0))
-        self._healthBar.update(health)
+        self._healthBar.update(health, self._spriteSurface)
+
+        self._spriteMidtop = (self._spriteSurface.get_width() / 2, 50)
 
         self._currentAnimation.update()
         character = self._currentAnimation.getCurrentFrame()
+
         self._spriteSurface.blit(
-            character,
-            character.get_rect(midtop=(self._spriteSurface.get_width() / 2,
-                                       50)))
+            character, character.get_rect(midtop=(self._spriteMidtop)))
         self._spriteSurface.blit(
             self._country,
             self._country.get_rect(
