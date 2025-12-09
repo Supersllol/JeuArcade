@@ -100,7 +100,6 @@ class RuleScene(Scene):
             self._main_rule_fade_done = False
             self._stateTimer.restart()
 
-
     def loopScene(self, events: List[pygame.event.Event]):
         self._mainApp.blit(
             self.bg_image,
@@ -135,7 +134,8 @@ class RuleScene(Scene):
                     self._stateTimer.restart()
 
                 if self._current_frame_index < len(self._scroll_frames):
-                    current_frame = self._scroll_frames[self._current_frame_index]
+                    current_frame = self._scroll_frames[
+                        self._current_frame_index]
                     self._mainApp.blit(current_frame, (0, -200))
                 else:
                     self._current_frame_index = len(self._scroll_frames) - 1
@@ -203,7 +203,9 @@ class RuleScene(Scene):
                             # Main rule does not fade again
                             self._stateTimer.restart()
                         else:
-                            print("All rules displayed. Transitioning to Game Scene.")
+                            print(
+                                "All rules displayed. Transitioning to Game Scene."
+                            )
                             self.sceneFinished = True
 
             if self._current_rule_index < len(self._rule_images):
@@ -215,20 +217,29 @@ class RuleScene(Scene):
 
                 # Draw background elements
                 if self._scroll_frames:
-                    self._mainApp.blit(self._scroll_frames[self._current_frame_index], (0, -200))
+                    self._mainApp.blit(
+                        self._scroll_frames[self._current_frame_index],
+                        (0, -200))
 
                 # Draw main rule image with first-time fade-in
                 if self._main_rule_fade_done and self._main_rule_alpha >= 255:
-                    self._mainApp.blit(self._main_rule_image, (rule_rect[0], rule_rect[1] - 50))
+                    self._mainApp.blit(self._main_rule_image,
+                                       (rule_rect[0], rule_rect[1] - 50))
                 else:
-                    temp_title = pygame.Surface(self._main_rule_image.get_size(), pygame.SRCALPHA)
-                    temp_title.fill((255, 255, 255, max(0, min(255, self._main_rule_alpha))))
-                    temp_title.blit(self._main_rule_image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-                    self._mainApp.blit(temp_title, (rule_rect[0], rule_rect[1] - 50))
+                    temp_title = pygame.Surface(
+                        self._main_rule_image.get_size(), pygame.SRCALPHA)
+                    temp_title.fill(
+                        (255, 255, 255, max(0, min(255,
+                                                   self._main_rule_alpha))))
+                    temp_title.blit(self._main_rule_image, (0, 0),
+                                    special_flags=pygame.BLEND_RGBA_MULT)
+                    self._mainApp.blit(temp_title,
+                                       (rule_rect[0], rule_rect[1] - 50))
 
                 # Apply alpha to rule image via per-pixel multiply (no set_alpha)
                 if self._rule_alpha < 255:
-                    temp_surface = pygame.Surface(rule_surface.get_size(), pygame.SRCALPHA)
+                    temp_surface = pygame.Surface(rule_surface.get_size(),
+                                                  pygame.SRCALPHA)
                     temp_surface.fill((255, 255, 255, self._rule_alpha))
                     temp_surface.blit(rule_surface, (0, 0),
                                       special_flags=pygame.BLEND_RGBA_MULT)
