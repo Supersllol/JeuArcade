@@ -7,8 +7,11 @@ from AA.AA_scenes.sceneClass import Scene
 from AA.AA_utils import inputManager, musicManager, settings, dbManager
 from AA.AA_utils.fontManager import upheaval
 
-#Test de single VS multiplayer
-singleplayer = False
+#Truc random
+alpha = [
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+    "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+]
 
 
 class NameScene(Scene):
@@ -16,7 +19,7 @@ class NameScene(Scene):
     def __init__(self, mainApp: pygame.Surface,
                  inputManager: inputManager.InputManager,
                  musicManager: musicManager.MusicManager,
-                 dbManager: dbManager.DatabaseManager):
+                 dbManager: dbManager.DatabaseManager, singlePlayer: bool):
 
         # Asset base path
         images_dir = os.path.join(settings.PARENT_PATH, "AA_images")
@@ -81,7 +84,7 @@ class NameScene(Scene):
                 y += 70
                 x = 73
 
-        self.info = upheaval("Choix du nom", 75, (255, 204, 37))
+        self.info = upheaval("Choix du nom", 80, (255, 204, 37))
 
         self.selection = pygame.image.load(
             os.path.join(images_dir, "selection.png")).convert_alpha()
@@ -115,13 +118,15 @@ class NameScene(Scene):
         self.prio2 = False
         self.text2 = upheaval("", 75, (255, 204, 37))
 
+        self._singlePlayer = singlePlayer
+
     def initScene(self):
         super().initScene()
 
     def loopScene(self, events: list[pygame.event.Event]):
 
         # Input: navigate with up/down, confirm with A/Start
-        for i in range(2):  # Check both players
+        for i in range(1 + int(not self._singlePlayer)):  # Check both players
             new_axes = self._inputManager.getAxesActive(i,
                                                         onlyCheckForNew=True)
             if inputManager.AxisInputs.Y_UP in new_axes:
@@ -137,7 +142,6 @@ class NameScene(Scene):
                             self.x2 = 0
                         self.y2 -= 1
                         self.selection_pos2[1] -= 70
-                print("UP")
             elif inputManager.AxisInputs.Y_DOWN in new_axes:
                 if i == 0:
                     if self.y <= 4:
@@ -153,7 +157,6 @@ class NameScene(Scene):
                             self.x2 = 0
                             self.selection_pos2[0] = 568
                         self.selection_pos2[1] += 70
-                print("DOWN")
             elif inputManager.AxisInputs.X_LEFT in new_axes:
                 if i == 0:  # PLAYER 1
                     if self.x > 0 and self.y != 5:
@@ -163,7 +166,6 @@ class NameScene(Scene):
                     if self.x2 > 0 and self.y2 != 5:
                         self.x2 -= 1
                         self.selection_pos2[0] -= 80
-                print("LEFT")
 
             elif inputManager.AxisInputs.X_RIGHT in new_axes:
                 if i == 0:  # PLAYER 1
@@ -174,7 +176,6 @@ class NameScene(Scene):
                     if self.x2 < 4 and self.y2 != 5:
                         self.x2 += 1
                         self.selection_pos2[0] += 80
-                print("RIGHT")
 
 ######################################################################### Axes ^^^^
 
@@ -189,7 +190,6 @@ class NameScene(Scene):
                         self.click = True
                         self.text = upheaval("".join(self.nom), 75,
                                              (255, 204, 37))
-                        print(f"A, {self.nom}")
                 else:
                     if len(self.nom2) < 3:
                         self.nom2.append(self.alphabet[self.y2][self.x2])
@@ -197,7 +197,6 @@ class NameScene(Scene):
                         self.click2 = True
                         self.text2 = upheaval("".join(self.nom2), 75,
                                               (255, 204, 37))
-                        print(f"A, {self.nom2}")
 
             elif inputManager.ButtonInputs.B in new_btns:
                 # Trigger action
@@ -206,33 +205,30 @@ class NameScene(Scene):
                         self.nom.pop()
                     self.ready = False
                     self.erreur = False
-                    self.text = upheaval("".join(self.nom), 75, (255, 204, 37))
+                    self.text = upheaval("".join(self.nom), 80, (255, 204, 37))
                     if self.prio:
                         self.ready2 = True
                         self.prio = False
                         self.prio2 = True
                         self.erreur2 = False
-                    print(f"B, {self.nom}")
                 else:
                     if len(self.nom2) > 0:
                         self.nom2.pop()
                     self.ready2 = False
                     self.erreur2 = False
-                    self.text2 = upheaval("".join(self.nom2), 75,
+                    self.text2 = upheaval("".join(self.nom2), 80,
                                           (255, 204, 37))
                     if self.prio2:
                         self.ready = True
                         self.prio2 = False
                         self.prio = True
                         self.erreur = False
-                    print(f"B, {self.nom2}")
 
             elif inputManager.ButtonInputs.START in new_btns:
                 if i == 0:
                     self.erreur = False
                     if not self.nom == ["C", "P", "U"] and len(self.nom) == 3:
                         if not self.ready2:
-                            print(f"{self.nom[0]} {self.nom[1]} {self.nom[2]}")
                             self.ready = True
                         else:
                             if self.nom != self.nom2:
@@ -247,9 +243,6 @@ class NameScene(Scene):
                     if not self.nom2 == ["C", "P", "U"] and len(
                             self.nom2) == 3:
                         if not self.ready:
-                            print(
-                                f"{self.nom2[0]} {self.nom2[1]} {self.nom2[2]}"
-                            )
                             self.ready2 = True
                         else:
                             if self.nom != self.nom2:
@@ -259,6 +252,7 @@ class NameScene(Scene):
                                 self.erreur2 = True
                     else:
                         self.erreur2 = True
+
 
 ################################################################################################INPUTS ^^^^^^
 
@@ -277,7 +271,7 @@ class NameScene(Scene):
                 (self.selection_pos1[0], self.selection_pos1[1]))
         self._mainApp.blit(self.lettres, (0, 0))
 
-        if not singleplayer:
+        if not self._singlePlayer:
             if self.click2:
                 self._mainApp.blit(
                     self.selection_o,
@@ -295,12 +289,15 @@ class NameScene(Scene):
                            (20, settings.WINDOW_SIZE[1] - 60))
         self._mainApp.blit(self._icons["a"],
                            (220, settings.WINDOW_SIZE[1] - 60))
+        # TODO
+        # self._mainApp.blit(self._icons["start"],
+        #                    (420, settings.WINDOW_SIZE[1] - 60))
         # Select input
         self._mainApp.blit(self._icons["b"],
-                           (420, settings.WINDOW_SIZE[1] - 60))
+                           (620, settings.WINDOW_SIZE[1] - 60))
         # Joystick input
         self._mainApp.blit(self._icons["select"],
-                           (620, settings.WINDOW_SIZE[1] - 60))
+                           (820, settings.WINDOW_SIZE[1] - 60))
 
         # 1. Grid position
         lettres_rect = self.lettres.get_rect(topleft=(0, 0))
@@ -317,7 +314,20 @@ class NameScene(Scene):
         self._mainApp.blit(self.text, (text_rect[0] + 1, text_rect[1] - 4))
 
         ########################################################
-        if not singleplayer:
+        if self._singlePlayer:
+            self._mainApp.blit(
+                self.nom_place,
+                self.nom_place.get_rect(
+                    center=(3 * self._mainApp.get_width() // 4,
+                            self._mainApp.get_height() // 2)))
+            texteCpu = upheaval("CPU", 80, (255, 204, 37))
+            self._mainApp.blit(
+                texteCpu,
+                texteCpu.get_rect(
+                    center=(3 * self._mainApp.get_width() // 4 + 2,
+                            self._mainApp.get_height() // 2 - 5)))
+        else:
+
             # 1. Grid position
             lettres_rect = self.lettres.get_rect(
                 topleft=(settings.WINDOW_SIZE[0] // 2, 0))
@@ -338,7 +348,7 @@ class NameScene(Scene):
             self._mainApp.blit(self.img_ver["check"], (350, 142))
         if self.erreur:
             self._mainApp.blit(self.img_ver["x"], (350, 142))
-        if not singleplayer:
+        if not self._singlePlayer:
             if self.ready2:
                 self._mainApp.blit(self.img_ver["check"], (863, 142))
             if self.erreur2:
@@ -349,7 +359,7 @@ class NameScene(Scene):
             self.info.get_rect(center=(self._mainApp.get_rect().centerx, 60)))
 
         if self.ready:
-            if not singleplayer:
+            if not self._singlePlayer:
                 if self.ready2:
                     self._sceneFinished = True
             else:
@@ -360,55 +370,3 @@ class NameScene(Scene):
 
     def getTransition(self) -> Scene | None:
         return None
-
-
-#Truc random
-alpha = [
-    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
-    "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
-]
-
-# Standalone test harness
-if __name__ == "__main__":
-    # Initialize pygame
-    pygame.init()
-    screen = pygame.display.set_mode(settings.WINDOW_SIZE)
-    pygame.display.set_caption("Dance Dance to the Death - Name Screen Test")
-    clock = pygame.time.Clock()
-
-    # Create dummy managers for testing
-    # InputManager needs a list of joysticks (empty list defaults to keyboard)
-    input_mgr = inputManager.InputManager([])  # Empty list = keyboard mode
-    music_mgr = musicManager.MusicManager()  # No arguments needed
-    db = dbManager.DatabaseManager()
-
-    # Create home scene
-    name_scene = NameScene(screen, input_mgr, music_mgr, db)
-    name_scene.initScene()
-
-    # Main loop
-    running = True
-    print("Name Screen Test Mode")
-    print(
-        "Controls: Arrow keys (UP/DOWN) to navigate, Q to select, ESC to quit")
-
-    while running:
-        events = pygame.event.get()
-
-        for event in events:
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-
-        # Run scene loop
-        if not name_scene.loopScene(events):
-            running = False
-
-        # Update display
-        pygame.display.flip()
-        clock.tick(settings.FRAMERATE)
-
-    pygame.quit()
-    print("Name screen test ended.")

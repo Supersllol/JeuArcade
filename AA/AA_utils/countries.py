@@ -23,6 +23,12 @@ def getRandomCPUCountry(playerCountry: CountryOptions) -> CountryOptions:
     return random.choice(options)
 
 
-def getCountryFlagSurface(country: CountryOptions):
+def getCountryFlagSurface(country: CountryOptions, width=settings.FLAG_WIDTH):
     img = pygame.image.load(os.path.join(settings.PARENT_PATH, country.value))
-    return misc.rescaleSurface(img, (settings.FLAG_WIDTH, None))
+    return misc.rescaleSurface(img, (width, None))
+
+
+def getCountryFromStr(countryAbrev: str):
+    for country in CountryOptions:
+        if countryAbrev == country.name:
+            return country
