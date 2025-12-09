@@ -20,9 +20,8 @@ class Sprite:
         self._travelStep = (0, 0)
         self._travelTimer = timer.Timer()
 
-        self._animationManager = animations.AnimationManager()
-        self._currentAnimation = self._animationManager.getAnimation(
-            animations.PlayerAnimations.STAND, playerID)
+        self._animationManager: animations.AnimationManager
+        self._currentAnimation: animations.Animation
 
         self._spriteSurface = pygame.Surface(
             (settings.SPRITE_SIZE[0], settings.SPRITE_SIZE[1] + 100),
@@ -36,6 +35,11 @@ class Sprite:
     @property
     def currentAnimation(self):
         return self._currentAnimation
+
+    def setAnimationManager(self, animManager: animations.AnimationManager):
+        self._animationManager = animManager
+        self._currentAnimation = self._animationManager.getAnimation(
+            animations.PlayerAnimations.STAND, self._playerID)
 
     def setAnimation(self, newAnimation: animations.PlayerAnimations,
                      changeSides: bool, loop: bool):

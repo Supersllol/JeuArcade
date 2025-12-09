@@ -15,6 +15,9 @@ class GameScene(sceneClass.Scene):
                  track: musicTrack.GameTracks, players: tuple[player.Player,
                                                               player.Player]):
         self._players = players
+        animManager = animations.AnimationManager()
+        for player in self._players:
+            player.setAnimationManager(animManager)
         self._playerAttacking = players[0]
         self._bgImage = pygame.transform.scale(
             pygame.image.load(

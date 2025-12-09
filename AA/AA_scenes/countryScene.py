@@ -5,7 +5,7 @@ from AA.AA_scenes import ruleScene, nameScene, gameScene
 
 from AA.AA_scenes.sceneClass import Scene
 from AA.AA_utils import inputManager, musicManager, settings, dbManager, countries, fontManager, misc
-from AA.AA_game import player
+from AA.AA_game import player, musicTrack
 
 flagWidth = 65
 
@@ -107,8 +107,8 @@ class CountryChooser:
             nom.get_rect(center=(self.allCountriesSurface.get_width() // 2 + 2,
                                  168)))
 
-        self.bgCountries = misc.rescaleSurface(self.bgCountries, (int(0.8 * 475), None))
-
+        self.bgCountries = misc.rescaleSurface(self.bgCountries,
+                                               (int(0.8 * 475), None))
 
         for i in range(len(self.countryNamesCenterPos)):
             for j in range(len(self.countryNamesCenterPos[i])):
@@ -193,9 +193,8 @@ class CountryScene(Scene):
 
         self._icons = {
             "b":
-            pygame.image.load(
-                os.path.join(icon_dir,
-                             "B - Retour.png")).convert_alpha(),
+            pygame.image.load(os.path.join(icon_dir,
+                                           "B - Retour.png")).convert_alpha(),
             "start":
             pygame.image.load(os.path.join(
                 icon_dir, "Start - Valider.png")).convert_alpha(),
@@ -296,13 +295,16 @@ class CountryScene(Scene):
                     self.names[1],
                     countries.getRandomCPUCountry(player0._country), 1,
                     self._mainApp)
-            #return ruleScene.RuleScene(self._mainApp, self._inputManager,
-             #                          self._musicManager, self._dbManager,
-              #                         (player0, player1))
-            return gameScene.GameScene(self._mainApp, self._inputManager,
+            return ruleScene.RuleScene(self._mainApp, self._inputManager,
                                        self._musicManager, self._dbManager,
-                                       musicTrack=gameScene.GameTracks.SEMI_CHARMED_LIFE,
-                                       players=(player0, player1))
+                                       (player0, player1))
+            # return gameScene.GameScene(
+            #     self._mainApp,
+            #     self._inputManager,
+            #     self._musicManager,
+            #     self._dbManager,
+            #     track=musicTrack.GameTracks.SEMI_CHARMED_LIFE,
+            #     players=(player0, player1))
         if self.transitionOption == 1:
             return nameScene.NameScene(self._mainApp, self._inputManager,
                                        self._musicManager, self._dbManager,

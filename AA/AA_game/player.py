@@ -76,6 +76,9 @@ class Player:
     def moveSprite(self, targetMidtop: tuple[int, int], travelTime: float):
         self._sprite.moveTo(targetMidtop, travelTime)
 
+    def setAnimationManager(self, animManager: animations.AnimationManager):
+        self._sprite.setAnimationManager(animManager)
+
     def changeAnimation(self,
                         newAnimation: animations.PlayerAnimations,
                         loop: bool = False,
