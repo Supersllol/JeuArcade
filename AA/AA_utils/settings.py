@@ -8,6 +8,7 @@ WINDOW_SIZE = (1024, 768)
 PARENT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SPRITE_SIZE = (300, 300)
+HADOKEN_SIZE = (625, 300)
 
 NOTE_SPEED = 300  # px/s
 NOTE_HIT_HEIGHT = 600
@@ -27,6 +28,7 @@ FLAG_WIDTH = 60
 
 SPRITE_BASE_POS = (120, 275)
 SPRITE_FIGHT_POS = (420, 275)
+HADOKEN_POS = (440, 275)
 
 FIGHT_DELAY = 1
 FIGHT_TIME_TO_MIDDLE = 1.5

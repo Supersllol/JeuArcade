@@ -39,7 +39,6 @@ class GameScene(sceneClass.Scene):
         self._playerSections = [[
             self._chosenTrack.getSection(j) for i in range(2)
         ] for j in range(self._chosenTrack.nbrSections)]
-        print(self._playerSections)
 
         super().__init__(mainApp, inputManager, musicManager, dbManager)
 
@@ -242,12 +241,14 @@ class GameScene(sceneClass.Scene):
                     self._playerAttacking = self._fightOrder[0]
                     attackedPlayer = self._players[
                         1 - self._playerAttacking._playerID]
-                    if self._playerAttacking.savedAttack == attackUtils.AttackType.Ultime:
+                    if self._playerAttacking.savedAttack == attackUtils.AttackType.Hadoken:
                         # TODO: change to fireball
                         self._playerAttacking.changeAnimation(
-                            animations.PlayerAnimations.DOUBLE_PUNCH)
+                            animations.PlayerAnimations.HADOKEN)
+                        self._playerAttacking.moveSprite(
+                            settings.HADOKEN_POS, 0)
                         attackedPlayer.changeAnimation(
-                            animations.PlayerAnimations.DAMAGE)
+                            animations.PlayerAnimations.EMPTY)
 
                     else:
                         if self._playerAttacking.savedAttack == attackUtils.AttackType.CoupPoing:
@@ -295,10 +296,10 @@ class GameScene(sceneClass.Scene):
                             attackDamage.get_rect(
                                 center=(self._mainApp.get_rect().centerx,
                                         225))))
-
-                    for player in self._players:
-                        player.changeAnimation(
-                            animations.PlayerAnimations.FIGHT)
+                    if self._playerAttacking.savedAttack != attackUtils.AttackType.Hadoken:
+                        for player in self._players:
+                            player.changeAnimation(
+                                animations.PlayerAnimations.FIGHT)
 
                     self._stateTimer.restart()
                     self._fightState = gameStates.FightState.WAIT_REGISTER_ATTACK
@@ -313,7 +314,7 @@ class GameScene(sceneClass.Scene):
                         1 - self._playerAttacking._playerID]
                     if attackedPlayer._health <= 0:
                         self._stateTimer.restart()
-                        if self._playerAttacking.savedAttack != attackUtils.AttackType.Ultime:
+                        if self._playerAttacking.savedAttack != attackUtils.AttackType.Hadoken:
                             attackedPlayer.changeAnimation(
                                 animations.PlayerAnimations.DEAD)
                         self._gameState = gameStates.GameState.END
@@ -387,9 +388,16 @@ class GameScene(sceneClass.Scene):
 
                 self._sceneFinished = True
 
-        for player in self._players:
-            player.update(currentMusicElapsed, self._gameState,
-                          self._inputManager)
+        if self._playerAttacking.savedAttack == attackUtils.AttackType.Hadoken:
+            attackedPlayer = self._players[1 - self._playerAttacking._playerID]
+            attackedPlayer.update(currentMusicElapsed, self._gameState,
+                                  self._inputManager)
+            self._playerAttacking.update(currentMusicElapsed, self._gameState,
+                                         self._inputManager)
+        else:
+            for player in self._players:
+                player.update(currentMusicElapsed, self._gameState,
+                              self._inputManager)
 
         for txt in currentText:
             self._mainApp.blit(txt.text, txt.position)

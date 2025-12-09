@@ -10,7 +10,7 @@ class Player:
                  playerID: int, mainApp: pygame.Surface):
         self._name = name
         self._country = country
-        self._totalChi = 0
+        self._totalChi = 1000000
         self._currentChi = self._totalChi
         self._health = 10
         self._playerID = playerID
@@ -30,7 +30,7 @@ class Player:
             (100, 100)).convert_alpha()
 
         self._playerHalf = pygame.Surface(
-            ((mainApp.get_width() / 2) + 50, mainApp.get_height()),
+            ((mainApp.get_width() / 2) + 250, mainApp.get_height()),
             pygame.SRCALPHA)
 
         self._trackSection: musicTrack.TrackSection
