@@ -38,8 +38,8 @@ class RuleScene(Scene):
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                settings.WINDOW_SIZE)
 
-        self._icons = pygame.image.load(os.path.join(icon_dir,
-                                                       "A -  Passer.png")).convert_alpha()
+        self._icons = pygame.image.load(
+            os.path.join(icon_dir, "A -  Passer.png")).convert_alpha()
         self._icons = pygame.transform.scale(self._icons, (225, 75))
 
         # Load scroll animation frames
@@ -50,8 +50,8 @@ class RuleScene(Scene):
             if os.path.exists(frame_path):
                 frame = pygame.image.load(frame_path).convert_alpha()
                 frame = pygame.transform.scale(
-                    frame,
-                    (settings.WINDOW_SIZE[0], settings.WINDOW_SIZE[1] * 1.5))
+                    frame, (settings.WINDOW_SIZE[0],
+                            int(settings.WINDOW_SIZE[1] * 1.5)))
                 self._scroll_frames.append(frame)
 
         # Load sensei animation frames
@@ -105,15 +105,16 @@ class RuleScene(Scene):
         """Update sensei animation frame if active"""
         if self._sensei_animation_active and self._sensei_frames:
             if self._sensei_timer.elapsed() >= self._sensei_frame_duration:
-                self._sensei_current_frame = (self._sensei_current_frame + 1) % len(self._sensei_frames)
+                self._sensei_current_frame = (self._sensei_current_frame +
+                                              1) % len(self._sensei_frames)
                 self._sensei_timer.restart()
+
     def _draw_sensei(self):
         if self._sensei_frames:
             frame = self._sensei_frames[self._sensei_current_frame]
             # Position in bottom right with some padding
-            rect = frame.get_rect(
-                bottomright=(settings.WINDOW_SIZE[0] + 100, 
-                           settings.WINDOW_SIZE[1] + 70))
+            rect = frame.get_rect(bottomright=(settings.WINDOW_SIZE[0] + 100,
+                                               settings.WINDOW_SIZE[1] + 70))
             self._mainApp.blit(frame, rect)
 
     def initScene(self):
@@ -128,7 +129,7 @@ class RuleScene(Scene):
             self._rule_alpha = 0
             self._main_rule_alpha = 0
             self._main_rule_fade_done = False
-        
+
         # Initialize sensei animation
         self._sensei_current_frame = 0
         self._sensei_animation_active = False
@@ -288,9 +289,7 @@ class RuleScene(Scene):
         if self._sensei_animation_active:
             self._update_sensei_animation()
         self._draw_sensei()
-        self._mainApp.blit(self._icons,
-                           (0,
-                            settings.WINDOW_SIZE[1] - 75))
+        self._mainApp.blit(self._icons, (0, settings.WINDOW_SIZE[1] - 75))
 
         return super().loopScene(events)
 
