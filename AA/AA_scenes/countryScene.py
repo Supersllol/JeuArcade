@@ -187,10 +187,13 @@ class CountryScene(Scene):
 
         icon_dir = os.path.join(images_dir, "AA_input_instruction")
 
+        super().__init__(mainApp, inputManager, musicManager, dbManager)
+
         self._icons = {
             "b":
-            pygame.image.load(os.path.join(icon_dir,
-                                           "B - retour.png")).convert_alpha(),
+            pygame.image.load(
+                os.path.join(icon_dir, "AA_input_instruction",
+                             "B - Retour.png")).convert_alpha(),
             "start":
             pygame.image.load(os.path.join(
                 icon_dir, "Start - Valider.png")).convert_alpha(),
@@ -215,8 +218,6 @@ class CountryScene(Scene):
         ]
 
         self.transitionOption = 0
-
-        super().__init__(mainApp, inputManager, musicManager, dbManager)
 
     def initScene(self):
         super().initScene()
