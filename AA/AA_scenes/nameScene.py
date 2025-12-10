@@ -260,15 +260,16 @@ class NameScene(sceneClass.Scene):
                     self.sceneFinished = True
 
             elif inputManager.ButtonInputs.START in new_btns:
-                self._sounds["confirm"].play()
                 # Trigger action
                 if i == 0:
                     self.erreur = False
                     if not self.nom == "CPU" and len(self.nom) == 3:
                         if not self.ready2:
+                            self._sounds["confirm"].play()
                             self.ready = True
                         else:
                             if self.nom != self.nom2:
+                                self._sounds["confirm"].play()
                                 self.ready = True
                             else:
                                 self.prio2 = True
@@ -279,9 +280,11 @@ class NameScene(sceneClass.Scene):
                     self.erreur2 = False
                     if not self.nom2 == "CPU" and len(self.nom2) == 3:
                         if not self.ready:
+                            self._sounds["confirm"].play()
                             self.ready2 = True
                         else:
                             if self.nom != self.nom2:
+                                self._sounds["confirm"].play()
                                 self.ready2 = True
                             else:
                                 self.prio = True
