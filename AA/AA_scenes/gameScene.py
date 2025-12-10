@@ -12,8 +12,8 @@ class GameScene(sceneClass.Scene):
                  inputManager: inputManager.InputManager,
                  musicManager: musicManager.MusicManager,
                  dbManager: dbManager.DatabaseManager,
-                 track: musicTrack.GameTracks, players: tuple[player.Player,
-                                                              player.Player]):
+                 trackBeatMap: musicTrack.TrackBeatMap,
+                 players: tuple[player.Player, player.Player]):
         self._players = players
         animManager = animations.AnimationManager()
         for player in self._players:
@@ -24,13 +24,12 @@ class GameScene(sceneClass.Scene):
                 os.path.join(settings.PARENT_PATH, "AA_images/dojo.jpg")),
             (1100, 600)).convert()
 
-        self._chosenTrack = musicTrack.TrackBeatMap(track)
+        self._chosenTrack = trackBeatMap
         self._currentTrackSectionID = 0
         self._targetStart = 0
 
         self._fightOrder: list[player.Player] = []
 
-        # TODO
         self._attackChiThresholds = self._chosenTrack.getChiThresholds()
 
         self._fadeOutStarted = False

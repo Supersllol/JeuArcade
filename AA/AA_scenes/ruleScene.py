@@ -33,7 +33,6 @@ class RuleScene(Scene):
         rules_dir = os.path.join(images_dir, "AA_rules")
         icon_dir = os.path.join(images_dir, "AA_input_instruction")
 
-
         self.bg_image = pygame.image.load(os.path.join(images_dir,
                                                        "dojo.jpg")).convert()
         self.bg_image = pygame.transform.scale(self.bg_image,
@@ -42,11 +41,11 @@ class RuleScene(Scene):
         self._icons = pygame.image.load(
             os.path.join(icon_dir, "A -  Passer.png")).convert_alpha()
         self._icons = pygame.transform.scale(self._icons, (225, 75))
-        
-                # SFX live one level above AA (e.g., JeuArcade/AA_sfx), so hop up a directory
+
+        # SFX live one level above AA (e.g., JeuArcade/AA_sfx), so hop up a directory
         sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),
-                      "AA_sfx")
-        
+                                  "AA_sfx")
+
         self._sounds = {
             "skip": pygame.mixer.Sound(os.path.join(sounds_dir, "Skip.wav"))
         }
@@ -143,11 +142,12 @@ class RuleScene(Scene):
         self._sensei_current_frame = 0
         self._sensei_animation_active = False
         self._stateTimer.restart()
-        
+
         # Start loop menu music if not already playing
         menu_music_path = os.path.join(os.path.dirname(settings.PARENT_PATH),
                                        "AA", "AA_chansons", "loop_menu.mp3")
-        if not self._musicManager.isLooping() or self._musicManager.getCurrentTrack() != menu_music_path:
+        if not self._musicManager.isLooping(
+        ) or self._musicManager.getCurrentTrack() != menu_music_path:
             self._musicManager.playLooping(menu_music_path)
 
     def loopScene(self, events: List[pygame.event.Event]):
@@ -311,10 +311,11 @@ class RuleScene(Scene):
         return super().loopScene(events)
 
     def getTransition(self):
-        return gameScene.GameScene(self._mainApp, self._inputManager,
-                                   self._musicManager, self._dbManager,
-                                   musicTrack.GameTracks.SEMI_CHARMED_LIFE,
-                                   self.players)
+        return gameScene.GameScene(
+            self._mainApp, self._inputManager, self._musicManager,
+            self._dbManager,
+            musicTrack.TrackBeatMap(musicTrack.GameTracks.TAKE_ON_ME),
+            self.players)
 
 
 if __name__ == "__main__":

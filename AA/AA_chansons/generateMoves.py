@@ -4,7 +4,7 @@ import random
 import json
 import pygame
 
-name = "Semi-Charmed Life"
+name = "Take on Me"
 y, sr = librosa.load(f"{name}.mp3")
 
 # Detect beats
@@ -14,11 +14,19 @@ tempo, beats = librosa.beat.beat_track(y=y, sr=sr, units='time')
 timestamps = sorted(set(list(beats)))
 
 # Prepare JSON structure
-data = {"songLength": None, "numNotes": None, "sections": {}, "notes": []}
+data = {
+    "Title": name,
+    "Artist": "",
+    "BPM": None,
+    "songLength": None,
+    "numNotes": len(timestamps),
+    "sections": {},
+    "notes": []
+}
 pygame.init()
 songLength = pygame.mixer.Sound(f"{name}.mp3").get_length()
 data["songLength"] = songLength
-data["numNotes"] = len(timestamps)
+data["BPM"] = int(round(len(timestamps) / (songLength / 60)))
 
 for i in range(6):
     quartile = songLength / 6
