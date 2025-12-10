@@ -75,13 +75,12 @@ class HomeScene(Scene):
         self._animation_time = 1 / settings.FRAMERATE  # Time per frame
         # Heartbeat animation parameters
         self._heart_time = 0.0
-        self._heart_bpm = 70  # beats per minute
+        self._heart_bpm = 155  # beats per minute - matches music BPM
         self._heart_scale_min = 1.0
         self._heart_scale_max = 1.10  # bump size
         self._heart_vertical_bump_px = 6  # slight vertical pop
-        # Pattern: two quick pulses ("lub-dub") then rest
-        self._heart_dub_spacing = 0.30  # seconds between the two pulses
-        self._heart_pulse_width = 0.40  # width of each pulse in seconds
+        # Pattern: single pulse per beat (simpler for faster BPM)
+        self._heart_pulse_width = 0.15  # width of each pulse in seconds
 
         # Load raw button images and normalize their sizes
         btn_images_raw = [
@@ -186,15 +185,15 @@ class HomeScene(Scene):
         self._heart_time = 0.0
         self._title_cache_index = 0
         self._glow_cache_index = 0
-        
+
         # Start loop menu music if not already playing
         menu_music_path = os.path.join(os.path.dirname(settings.PARENT_PATH),
                                        "AA", "AA_chansons", "loop_menu.mp3")
-        if not self._musicManager.isLooping() or self._musicManager.getCurrentTrack() != menu_music_path:
+        if self._musicManager.getCurrentTrack() != menu_music_path:
             self._musicManager.playLooping(menu_music_path)
 
     def _heartbeat_scale(self, t: float) -> float:
-        # Compute lub-dub pulse strength between 0 and 1
+        # Compute single pulse strength between 0 and 1
         seconds_per_beat = 60.0 / max(self._heart_bpm, 1)
         # Time within the beat cycle
         phase = t % seconds_per_beat
@@ -206,10 +205,8 @@ class HomeScene(Scene):
             # Sharp peak that falls off smoothly
             return math.exp(-d * d * 3.5)
 
-        # First pulse at 0, second pulse shortly after
-        p1 = pulse(phase, 0.0, self._heart_pulse_width)
-        p2 = pulse(phase, self._heart_dub_spacing, self._heart_pulse_width)
-        strength = max(p1, p2)
+        # Single pulse at the start of each beat
+        strength = pulse(phase, 0.0, self._heart_pulse_width)
 
         # Map strength to scale range
         return self._heart_scale_min + (self._heart_scale_max -
@@ -217,10 +214,17 @@ class HomeScene(Scene):
 
     def loopScene(self, events: List[pygame.event.Event]):
 
-        # Increment cache indices
+        # Get music position for synchronized heartbeat
+        music_time = self._musicManager.getMusicElapsedSeconds()
+
+        # Calculate which frame to show based on music position
+        seconds_per_beat = 60.0 / max(self._heart_bpm, 1)
+        phase_in_beat = music_time % seconds_per_beat
+        # Map phase to cache index
+        self._title_cache_index = int((phase_in_beat / seconds_per_beat) * len(self._title_cache)) % len(self._title_cache)
+
+        # Update glow animation based on frame timer
         if self._animation_time <= self._stateTimer.elapsed():
-            self._title_cache_index = (self._title_cache_index + 1) % len(
-                self._title_cache)
             self._glow_cache_index = (self._glow_cache_index + 1) % len(
                 self._glow_cache)
             self._stateTimer.restart()
@@ -301,7 +305,6 @@ class HomeScene(Scene):
 
     def getTransition(self):
         # Default transition passthrough
-        print("Transitioning to Game Scene")
         if self.selected_index == 0:
             return nameScene.NameScene(self._mainApp, self._inputManager,
                                        self._musicManager, self._dbManager,

@@ -33,10 +33,15 @@ class SplashScene(Scene):
             os.path.join(images_dir, "splashscreen.png")).convert()
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                settings.WINDOW_SIZE)
-        self.display_duration = 3  # Duration to display splash screen in seconds
+        self.display_duration = 5.20  # Duration to display splash screen in seconds
 
     def initScene(self):
         super().initScene()
+        # Start loop menu music if not already playing
+        menu_music_path = os.path.join(os.path.dirname(settings.PARENT_PATH),
+                                       "AA", "AA_chansons", "start_menu.mp3")
+        if not self._musicManager.isLooping() or self._musicManager.getCurrentTrack() != menu_music_path:
+            self._musicManager.playLooping(menu_music_path)
         # Music can be played here if desired
 
     def loopScene(self, events: list[pygame.event.Event]):
