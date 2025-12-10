@@ -43,8 +43,8 @@ class RuleScene(Scene):
         self._icons = pygame.transform.scale(self._icons, (225, 75))
 
         # SFX live one level above AA (e.g., JeuArcade/AA_sfx), so hop up a directory
-        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),
-                                  "AA_sfx")
+        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),"AA",
+                      "AA_sfx")
 
         self._sounds = {
             "skip": pygame.mixer.Sound(os.path.join(sounds_dir, "Skip.wav"))

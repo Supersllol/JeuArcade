@@ -32,8 +32,8 @@ class HomeScene(Scene):
         images_dir = os.path.join(settings.PARENT_PATH, "AA_images")
         icon_dir = os.path.join(images_dir, "AA_input_instruction")
         # SFX live one level above AA (e.g., JeuArcade/AA_sfx), so hop up a directory
-        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),
-                      "AA_sfx")
+        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH), "AA",
+                                                                        "AA_sfx")
         
         self._sounds = {
             "select": pygame.mixer.Sound(os.path.join(sounds_dir, "Select.wav")),

@@ -32,8 +32,8 @@ class TrackSelectionScene(sceneClass.Scene):
                 icon_dir, "Déplacer - Joystick.png")).convert_alpha(),
         }
 
-        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),
-                                  "AA_sfx")
+        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH), "AA",
+                                                                        "AA_sfx")
 
         self._sounds = {
             "option": pygame.mixer.Sound(os.path.join(sounds_dir,

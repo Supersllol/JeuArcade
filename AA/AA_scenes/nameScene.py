@@ -30,8 +30,8 @@ class NameScene(sceneClass.Scene):
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                settings.WINDOW_SIZE)
         # SFX live one level above AA (e.g., JeuArcade/AA_sfx), so hop up a directory
-        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),
-                      "AA_sfx")
+        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH), "AA",
+                                                                        "AA_sfx")
         
         self._sounds = {
             "select": pygame.mixer.Sound(os.path.join(sounds_dir, "Select.wav")),

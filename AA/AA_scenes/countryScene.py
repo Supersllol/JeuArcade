@@ -27,7 +27,7 @@ class CountryChooser:
                              "fond_bleu.png")), (475, None))
         
         # SFX live one level above AA (e.g., JeuArcade/AA_sfx), so hop up a directory
-        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),
+        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),"AA",
                       "AA_sfx")
         
         self._sounds = {
