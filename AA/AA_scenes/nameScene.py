@@ -105,6 +105,7 @@ class NameScene(sceneClass.Scene):
                          ["U", "V", "W", "X", "Y"], ["Z"]]
         self.y = 0
         self.x = 0
+        self.test = 0
         self.nom = names[0]  # store name as a string
         self.ready = False
         self.erreur = False
@@ -115,6 +116,7 @@ class NameScene(sceneClass.Scene):
         # 2nd player
         self.y2 = 0
         self.x2 = 0
+        self.test2 = 0
         self.nom2 = names[1]  # store second player's name as a string
         self.ready2 = False
         self.erreur2 = False
@@ -271,10 +273,11 @@ class NameScene(sceneClass.Scene):
             self.bg_image.get_rect(center=self._mainApp.get_rect().center))
 
         if self.click:
-            self._mainApp.blit(
-                self.selection_o,
-                (self.selection_pos1[0], self.selection_pos1[1]))
-            self.click = False
+            self._mainApp.blit(self.selection_o,(self.selection_pos1[0], self.selection_pos1[1]))
+            self.test += 1
+            if self.test == 60:
+                self.click = False
+                self.test = 0
         else:
             self._mainApp.blit(
                 self.selection,
@@ -286,7 +289,10 @@ class NameScene(sceneClass.Scene):
                 self._mainApp.blit(
                     self.selection_o,
                     (self.selection_pos2[0], self.selection_pos2[1]))
-                self.click2 = False
+                self.test2 += 1
+                if self.test2 == 60:
+                    self.click2 = False
+                    self.test2 = 0
             else:
                 self._mainApp.blit(
                     self.selection,
