@@ -53,6 +53,10 @@ class GameScene(sceneClass.Scene):
         for player in self._players:
             player.loadSection(self._playerSections[
                 self._currentTrackSectionID][player._playerID])
+        
+        # Stop menu music before starting game music
+        self._musicManager.stop()
+        
         super().initScene()
 
     def _chooseNextSection(self):

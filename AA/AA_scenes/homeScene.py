@@ -186,6 +186,12 @@ class HomeScene(Scene):
         self._heart_time = 0.0
         self._title_cache_index = 0
         self._glow_cache_index = 0
+        
+        # Start loop menu music if not already playing
+        menu_music_path = os.path.join(os.path.dirname(settings.PARENT_PATH),
+                                       "AA", "AA_chansons", "loop_menu.mp3")
+        if not self._musicManager.isLooping() or self._musicManager.getCurrentTrack() != menu_music_path:
+            self._musicManager.playLooping(menu_music_path)
 
     def _heartbeat_scale(self, t: float) -> float:
         # Compute lub-dub pulse strength between 0 and 1

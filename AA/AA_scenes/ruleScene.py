@@ -143,6 +143,12 @@ class RuleScene(Scene):
         self._sensei_current_frame = 0
         self._sensei_animation_active = False
         self._stateTimer.restart()
+        
+        # Start loop menu music if not already playing
+        menu_music_path = os.path.join(os.path.dirname(settings.PARENT_PATH),
+                                       "AA", "AA_chansons", "loop_menu.mp3")
+        if not self._musicManager.isLooping() or self._musicManager.getCurrentTrack() != menu_music_path:
+            self._musicManager.playLooping(menu_music_path)
 
     def loopScene(self, events: List[pygame.event.Event]):
         self._mainApp.blit(

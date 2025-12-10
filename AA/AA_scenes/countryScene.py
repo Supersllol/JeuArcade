@@ -239,6 +239,12 @@ class CountryScene(Scene):
 
     def initScene(self):
         super().initScene()
+        
+        # Start loop menu music if not already playing
+        menu_music_path = os.path.join(os.path.dirname(settings.PARENT_PATH),
+                                       "AA", "AA_chansons", "loop_menu.mp3")
+        if not self._musicManager.isLooping() or self._musicManager.getCurrentTrack() != menu_music_path:
+            self._musicManager.playLooping(menu_music_path)
 
     def returnToPreviousScreen(self):
         pass
