@@ -29,6 +29,16 @@ class NameScene(sceneClass.Scene):
                                                        "dojo.jpg")).convert()
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                settings.WINDOW_SIZE)
+        # SFX live one level above AA (e.g., JeuArcade/AA_sfx), so hop up a directory
+        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),
+                      "AA_sfx")
+        
+        self._sounds = {
+            "select": pygame.mixer.Sound(os.path.join(sounds_dir, "Select.wav")),
+            "option" : pygame.mixer.Sound(os.path.join(sounds_dir, "Option.wav")),
+            "back": pygame.mixer.Sound(os.path.join(sounds_dir, "Back.wav")),
+            "confirm": pygame.mixer.Sound(os.path.join(sounds_dir, "Confirm.wav")),
+        }
 
         super().__init__(mainApp, inputManager, musicManager, dbManager)
 
@@ -137,6 +147,7 @@ class NameScene(sceneClass.Scene):
             new_axes = self._inputManager.getAxesActive(i,
                                                         onlyCheckForNew=True)
             if inputManager.AxisInputs.Y_UP in new_axes:
+                self._sounds["option"].play()
                 if i == 0:
                     if self.y > 0:
                         if self.y == 5:
@@ -150,6 +161,7 @@ class NameScene(sceneClass.Scene):
                         self.y2 -= 1
                         self.selection_pos2[1] -= 70
             elif inputManager.AxisInputs.Y_DOWN in new_axes:
+                self._sounds["option"].play()
                 if i == 0:
                     if self.y <= 4:
                         self.y += 1
@@ -165,6 +177,7 @@ class NameScene(sceneClass.Scene):
                             self.selection_pos2[0] = 568
                         self.selection_pos2[1] += 70
             elif inputManager.AxisInputs.X_LEFT in new_axes:
+                self._sounds["option"].play()
                 if i == 0:  # PLAYER 1
                     if self.x > 0 and self.y != 5:
                         self.x -= 1
@@ -175,6 +188,7 @@ class NameScene(sceneClass.Scene):
                         self.selection_pos2[0] -= 80
 
             elif inputManager.AxisInputs.X_RIGHT in new_axes:
+                self._sounds["option"].play()
                 if i == 0:  # PLAYER 1
                     if self.x < 4 and self.y != 5:
                         self.x += 1
@@ -190,6 +204,7 @@ class NameScene(sceneClass.Scene):
                                                          onlyCheckForNew=True)
             if inputManager.ButtonInputs.A in new_btns:
                 # Trigger action
+                self._sounds["select"].play()
                 if i == 0:
                     if len(self.nom) < 3:
                         self.nom += self.alphabet[self.y][self.x]
@@ -204,6 +219,7 @@ class NameScene(sceneClass.Scene):
                         self.text2 = upheaval(self.nom2, 75, (255, 204, 37))
 
             elif inputManager.ButtonInputs.B in new_btns:
+                self._sounds["back"].play()
                 # Trigger action
                 requestedExit = False
                 if i == 0:
@@ -238,6 +254,8 @@ class NameScene(sceneClass.Scene):
                     self.sceneFinished = True
 
             elif inputManager.ButtonInputs.START in new_btns:
+                self._sounds["confirm"].play()
+                # Trigger action
                 if i == 0:
                     self.erreur = False
                     if not self.nom == "CPU" and len(self.nom) == 3:
