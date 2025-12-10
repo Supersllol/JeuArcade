@@ -4,7 +4,7 @@ import pygame, os
 from AA.AA_scenes import homeScene
 
 from AA.AA_scenes import sceneClass, countryScene, homeScene
-from AA.AA_utils import inputManager, musicManager, settings, dbManager
+from AA.AA_utils import inputManager, musicManager, settings, dbManager, timer
 from AA.AA_utils.fontManager import upheaval
 
 #Truc random
@@ -105,7 +105,7 @@ class NameScene(sceneClass.Scene):
                          ["U", "V", "W", "X", "Y"], ["Z"]]
         self.y = 0
         self.x = 0
-        self.test = 0
+        self.timer = timer.Timer()
         self.nom = names[0]  # store name as a string
         self.ready = False
         self.erreur = False
@@ -116,7 +116,7 @@ class NameScene(sceneClass.Scene):
         # 2nd player
         self.y2 = 0
         self.x2 = 0
-        self.test2 = 0
+        self.timer2 = timer.Timer()
         self.nom2 = names[1]  # store second player's name as a string
         self.ready2 = False
         self.erreur2 = False
@@ -273,11 +273,13 @@ class NameScene(sceneClass.Scene):
             self.bg_image.get_rect(center=self._mainApp.get_rect().center))
 
         if self.click:
-            self._mainApp.blit(self.selection_o,(self.selection_pos1[0], self.selection_pos1[1]))
-            self.test += 1
-            if self.test == 60:
+            self._mainApp.blit(
+                self.selection_o,
+                (self.selection_pos1[0], self.selection_pos1[1]))
+            self.timer.start()
+            if self.timer.elapsed() >= settings.NAME_INDICATOR_TIME:
                 self.click = False
-                self.test = 0
+                self.timer.stop()
         else:
             self._mainApp.blit(
                 self.selection,
@@ -289,10 +291,10 @@ class NameScene(sceneClass.Scene):
                 self._mainApp.blit(
                     self.selection_o,
                     (self.selection_pos2[0], self.selection_pos2[1]))
-                self.test2 += 1
-                if self.test2 == 60:
+                self.timer2.start()
+                if self.timer2.elapsed() >= settings.NAME_INDICATOR_TIME:
                     self.click2 = False
-                    self.test2 = 0
+                    self.timer2.stop()
             else:
                 self._mainApp.blit(
                     self.selection,

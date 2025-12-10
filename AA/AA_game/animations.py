@@ -13,6 +13,7 @@ class Animation:
         self._currentFrameID = 0
         self._loop = False
         self._name = name
+        self._returnToDefault = False
 
     @property
     def name(self):
@@ -22,36 +23,34 @@ class Animation:
         return self._frames[self._currentFrameID]
 
     def update(self):
-        if self._timer.elapsed() > (1 / settings.ANIMATION_FPS):
-            if self.isAnimationFinished():
-                if self._loop:
-                    self._currentFrameID = 0
-                    self._timer.restart()
-                else:
-                    self._timer.stop()
-            else:
-                self._currentFrameID += 1
+        if self.isAnimationFinished():
+            if self._loop:
+                self._currentFrameID = 0
                 self._timer.restart()
 
-    def startAnimation(self, loop: bool):
+        elif self._timer.elapsed() > (1 / settings.ANIMATION_FPS):
+            self._currentFrameID += 1
+            self._timer.restart()
+
+    def startAnimation(self, loop: bool, returnToDefault=False):
         self._currentFrameID = 0
         self._timer.restart()
         self._loop = loop
+        self._returnToDefault = returnToDefault
 
     def isAnimationFinished(self):
-        return self._currentFrameID == len(self._frames) - 1
+        return (self._currentFrameID == len(self._frames) -
+                1) and (self._timer.elapsed() > (1 / settings.ANIMATION_FPS))
 
 
 def loadFromFolder(folderPath: str, animationName: PlayerAnimations):
     frames: list[pygame.Surface] = []
     for i in range(25):
         frame_path = os.path.join(folderPath, f"tile{i:03d}.png")
-        print(frame_path)
         if os.path.exists(frame_path):
             frame = misc.rescaleSurface(pygame.image.load(frame_path),
                                         (None, settings.SPRITE_SIZE[1]))
             frames.append(frame)
-    print(frames)
     return Animation(frames, animationName)
 
 
@@ -63,7 +62,10 @@ def loadSpriteSheet(animation: PlayerAnimations, playerID: int):
             os.path.join(settings.PARENT_PATH, "AA_images", "Animations",
                          f"HADOKEN_{playerID}"), PlayerAnimations.HADOKEN)
     # load the sheet (get original size first to support non-square frames)
-    suffix = ".png" if animation == PlayerAnimations.STAND else f"_{playerID}.png"
+    suffix = ".png" if animation in (
+        PlayerAnimations.STAND, PlayerAnimations.DANCE_0,
+        PlayerAnimations.DANCE_1, PlayerAnimations.DANCE_2,
+        PlayerAnimations.DANCE_3) else f"_{playerID}.png"
     name = animation.name + suffix
     sheet_path = os.path.join(settings.PARENT_PATH, "AA_images", "Animations",
                               name)
@@ -131,4 +133,14 @@ class PlayerAnimations(Enum):
     KICK = auto()
     DOUBLE_PUNCH = auto()
     HADOKEN = auto()
+    DANCE_0 = auto()
+    DANCE_1 = auto()
+    DANCE_2 = auto()
+    DANCE_3 = auto()
     EMPTY = auto()
+
+
+danceMoves = [
+    PlayerAnimations.DANCE_0, PlayerAnimations.DANCE_1,
+    PlayerAnimations.DANCE_2, PlayerAnimations.DANCE_3
+]
