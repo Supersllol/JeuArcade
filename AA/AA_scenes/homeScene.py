@@ -31,6 +31,12 @@ class HomeScene(Scene):
         # Asset base path
         images_dir = os.path.join(settings.PARENT_PATH, "AA_images")
         icon_dir = os.path.join(images_dir, "AA_input_instruction")
+        sounds_dir = os.path.join(settings.PARENT_PATH, "AA_sfx")
+        
+        self._sounds = {
+            "select": pygame.mixer.Sound(os.path.join(sounds_dir, "Select.wav")),
+            "option" : pygame.mixer.Sound(os.path.join(sounds_dir, "Option.wav"))
+        }
 
         # Load background and scale to window
         self.bg_image = pygame.image.load(os.path.join(images_dir,
@@ -218,9 +224,11 @@ class HomeScene(Scene):
             if inputManager.AxisInputs.Y_UP in new_axes:
                 self.selected_index = (self.selected_index - 1) % len(
                     self.btn_images)
+                self._sounds["option"].play()
             elif inputManager.AxisInputs.Y_DOWN in new_axes:
                 self.selected_index = (self.selected_index + 1) % len(
                     self.btn_images)
+                self._sounds["option"].play()
 
             new_btns = self._inputManager.getBtnsPressed(i,
                                                          onlyCheckForNew=True)
@@ -228,6 +236,7 @@ class HomeScene(Scene):
                 # Trigger action
                 print(f"Selected: {self.btn_names[self.selected_index]}")
                 self.sceneFinished = True
+                self._sounds["select"].play()
 
         # Draw: background + title
         self._mainApp.blit(
