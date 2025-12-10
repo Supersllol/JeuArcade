@@ -10,7 +10,7 @@ class Player:
                  playerID: int, mainApp: pygame.Surface):
         self._name = name
         self._country = country
-        self._totalChi = 1000000
+        self._totalChi = 0
         self._currentChi = self._totalChi
         self._health = 10
         self._playerID = playerID
@@ -141,7 +141,7 @@ class Player:
                      musicElapsedTime: float):
         for lane in self._trackSection.lanes:
             if inputManager.moveBindings[lane.laneID] == btnPressed:
-                # TODO: animate player
+                self.changeAnimation(animations.danceMoves[lane.laneID])
                 self._noteSheet.laneBtnPressed(lane.laneID)
                 if len(lane.activeNotes) == 0: return
                 closestNote = lane.activeNotes[0]
@@ -204,7 +204,11 @@ class Player:
 
         self._noteSheet.update(self._trackSection, gameState)
         self._chiBar.update(self._currentChi, self._totalChi)
+
         self._sprite.update(self._health)
+        if gameState != gameStates.GameState.FIGHT_SCENE:
+            if self._sprite.currentAnimation.isAnimationFinished():
+                self.changeAnimation(animations.PlayerAnimations.STAND)
 
         if gameState == gameStates.GameState.WAIT_FOR_ATTACK:
             if self._cpu and self._savedAttack == attackUtils.AttackType.PasChoisi:
