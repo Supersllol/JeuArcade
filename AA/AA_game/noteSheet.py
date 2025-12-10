@@ -136,7 +136,7 @@ class NoteSheet:
         self._noteIndicators = [
             NoteIndicator(
                 self._mainSheet, i,
-                (self.getLaneCenterXPos(i), settings.NOTE_HIT_HEIGHT - 3))
+                (self.getLaneCenterXPos(i), settings.NOTE_HIT_HEIGHT - 33))
             for i in range(4)
         ]
 

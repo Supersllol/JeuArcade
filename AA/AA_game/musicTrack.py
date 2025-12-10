@@ -5,10 +5,10 @@ from enum import Enum
 
 
 class GameTracks(Enum):
+    WHAT_IS_LOVE = "What Is Love"
+    TAKE_ON_ME = "Take on Me"
     I_JUST_DIED_IN_YOUR_ARMS = "I Just Died In Your Arms"
     SEMI_CHARMED_LIFE = "Semi-Charmed Life"
-    TAKE_ON_ME = "Take on Me"
-    WHAT_IS_LOVE = "What Is Love"
     CHARLIE_KIRK = "We Are Charlie Kirk"
 
 
