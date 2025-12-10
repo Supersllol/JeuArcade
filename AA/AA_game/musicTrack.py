@@ -117,6 +117,8 @@ class TrackBeatMap:
     def __init__(self, chosenTrack: GameTracks):
         self._audioFile = os.path.join(settings.PARENT_PATH,
                                        f"AA_chansons/{chosenTrack.value}.mp3")
+        self._albumCoverFile = os.path.join(
+            settings.PARENT_PATH, f"AA_chansons/{chosenTrack.value}.png")
 
         with open(os.path.join(settings.PARENT_PATH,
                                f"AA_chansons/beat-{chosenTrack.value}.json"),
@@ -125,6 +127,9 @@ class TrackBeatMap:
             self._beatMap = json.load(file)
             self._nbrSections = len(self._beatMap["sections"])
             self._nbrNotes = self._beatMap["numNotes"]
+            self._songArtist = self._beatMap["Artist"]
+            self._songName = self._beatMap["Title"]
+            self._songBPM = self._beatMap["BPM"]
 
     def getChiThresholds(self):
         thresholds: list[tuple[attackUtils.AttackType, float]] = []
@@ -180,3 +185,19 @@ class TrackBeatMap:
     @property
     def audioFile(self):
         return self._audioFile
+
+    @property
+    def albumCoverFile(self):
+        return self._albumCoverFile
+
+    @property
+    def songName(self):
+        return self._songName
+
+    @property
+    def songArtist(self):
+        return self._songArtist
+
+    @property
+    def songBPM(self):
+        return self._songBPM

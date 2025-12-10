@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
 import pygame
 from typing import List
-from AA.AA_scenes import gameScene
+from AA.AA_scenes import gameScene, trackSelectionScene
 from AA.AA_scenes.sceneClass import Scene
 from AA.AA_game import musicTrack, player
 from AA.AA_utils import inputManager, musicManager, settings, countries, dbManager, timer
@@ -311,11 +311,11 @@ class RuleScene(Scene):
         return super().loopScene(events)
 
     def getTransition(self):
-        return gameScene.GameScene(
-            self._mainApp, self._inputManager, self._musicManager,
-            self._dbManager,
-            musicTrack.TrackBeatMap(musicTrack.GameTracks.TAKE_ON_ME),
-            self.players)
+        return trackSelectionScene.TrackSelectionScene(self._mainApp,
+                                                       self._inputManager,
+                                                       self._musicManager,
+                                                       self._dbManager,
+                                                       self.players)
 
 
 if __name__ == "__main__":

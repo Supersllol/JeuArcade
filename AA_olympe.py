@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pygame
-from AA.AA_scenes import gameScene, homeScene, splashScene, nameScene, countryScene, rankingsScene
+from AA.AA_scenes import gameScene, homeScene, splashScene, nameScene, countryScene, rankingsScene, trackSelectionScene
 from AA.AA_utils import inputManager, musicManager, countries, settings, timer, dbManager
 from AA.AA_game import musicTrack, player
 
@@ -34,8 +34,11 @@ def main():
     # currentScene = countryScene.CountryScene(mainApp, input, music, db,
     #                                          ("SIM", "CPU"))
     currentScene = splashScene.SplashScene(mainApp, input, music, db)
-    #player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
-    #player1 = player.Player("CPU", countries.CountryOptions.QBC, 1, mainApp)
+
+    player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
+    player1 = player.Player("CPU", countries.CountryOptions.QBC, 1, mainApp)
+    # currentScene = trackSelectionScene.TrackSelectionScene(
+    #     mainApp, input, music, db, (player0, player1))
     #currentScene = gameScene.GameScene(mainApp, input, music, db,
     #                                  musicTrack.GameTracks.SEMI_CHARMED_LIFE,
     #                                   (player0, player1))
