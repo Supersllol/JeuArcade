@@ -33,6 +33,7 @@ class RuleScene(Scene):
         rules_dir = os.path.join(images_dir, "AA_rules")
         icon_dir = os.path.join(images_dir, "AA_input_instruction")
 
+
         self.bg_image = pygame.image.load(os.path.join(images_dir,
                                                        "dojo.jpg")).convert()
         self.bg_image = pygame.transform.scale(self.bg_image,
@@ -41,6 +42,14 @@ class RuleScene(Scene):
         self._icons = pygame.image.load(
             os.path.join(icon_dir, "A -  Passer.png")).convert_alpha()
         self._icons = pygame.transform.scale(self._icons, (225, 75))
+        
+                # SFX live one level above AA (e.g., JeuArcade/AA_sfx), so hop up a directory
+        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),
+                      "AA_sfx")
+        
+        self._sounds = {
+            "skip": pygame.mixer.Sound(os.path.join(sounds_dir, "Skip.wav"))
+        }
 
         # Load scroll animation frames
         scroll_anim_dir = os.path.join(images_dir, "AA_scroll_anim")
@@ -153,6 +162,7 @@ class RuleScene(Scene):
         if len(self._scroll_frames) > 0 and self._animation_playing:
             # If A pressed, skip scroll anim
             if a_pressed:
+                self._sounds["skip"].play()
                 self._animation_playing = False
                 self._current_frame_index = len(self._scroll_frames) - 1
 
@@ -189,6 +199,7 @@ class RuleScene(Scene):
         elif self._rule_phase != "idle" and len(self._rule_images) > 0:
 
             if a_pressed:
+                self._sounds["skip"].play()
                 if self._rule_phase == "fade_in":
                     self._rule_phase = "display"
                     self._rule_alpha = 255

@@ -25,7 +25,18 @@ class CountryChooser:
             pygame.image.load(
                 os.path.join(settings.PARENT_PATH, "AA_images",
                              "fond_bleu.png")), (475, None))
-
+        
+        # SFX live one level above AA (e.g., JeuArcade/AA_sfx), so hop up a directory
+        sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH),
+                      "AA_sfx")
+        
+        self._sounds = {
+            "select": pygame.mixer.Sound(os.path.join(sounds_dir, "Select.wav")),
+            "option" : pygame.mixer.Sound(os.path.join(sounds_dir, "Option.wav")),
+            "back": pygame.mixer.Sound(os.path.join(sounds_dir, "Back.wav")),
+            "confirm": pygame.mixer.Sound(os.path.join(sounds_dir, "Confirm.wav")),
+        }
+        
         self.currentChoiceIndex = 0
         self.countryChoices = list(countries.CountryOptions)
 
@@ -148,9 +159,11 @@ class CountryChooser:
     def updateIndicator(self, btns: list[inputManager.ButtonInputs],
                         axes: list[inputManager.AxisInputs]):
         if inputManager.ButtonInputs.START in btns:
+            self._sounds["confirm"].play()
             self.validated = True
             self.currentIndicator = self.validationIndicator
         if inputManager.ButtonInputs.B in btns:
+            self._sounds["back"].play()
             if not self.validated:
                 self.askForExit = True
             self.validated = False
@@ -158,14 +171,18 @@ class CountryChooser:
 
         if not self.validated and not self.alreadyInDb:
             if inputManager.AxisInputs.X_LEFT in axes:
+                self._sounds["option"].play()
                 self.currentChoiceIndex = (self.currentChoiceIndex - 5) % 10
             if inputManager.AxisInputs.X_RIGHT in axes:
+                self._sounds["option"].play()
                 self.currentChoiceIndex = (self.currentChoiceIndex + 5) % 10
             if inputManager.AxisInputs.Y_DOWN in axes:
+                self._sounds["option"].play()
                 currentColumn = 0 if self.currentChoiceIndex < 5 else 1
                 self.currentChoiceIndex = 5 * currentColumn + (
                     (self.currentChoiceIndex - 5 * currentColumn) + 1) % 5
             if inputManager.AxisInputs.Y_UP in axes:
+                self._sounds["option"].play()
                 currentColumn = 0 if self.currentChoiceIndex < 5 else 1
                 self.currentChoiceIndex = 5 * currentColumn + (
                     (self.currentChoiceIndex - 5 * currentColumn) - 1) % 5
