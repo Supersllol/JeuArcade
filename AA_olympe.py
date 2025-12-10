@@ -29,16 +29,16 @@ def main():
     # currentScene = rankingsScene.RankingsScene(mainApp, input, music, db,
     #                                            ("SIM", "GTB"))
     # currentScene = homeScene.HomeScene(mainApp, input, music, db)
-    # currentScene = nameScene.NameScene(mainApp, input, music, db,!
+    # currentScene = nameScene.NameScene(mainApp, input, music, db,
     #                                    ("TST", "CPU"))
     # currentScene = countryScene.CountryScene(mainApp, input, music, db,
     #                                          ("SIM", "CPU"))
-    # currentScene = splashScene.SplashScene(mainApp, input, music, db)
-    player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
-    player1 = player.Player("CPU", countries.CountryOptions.QBC, 1, mainApp)
-    currentScene = gameScene.GameScene(mainApp, input, music, db,
-                                       musicTrack.GameTracks.SEMI_CHARMED_LIFE,
-                                       (player0, player1))
+    currentScene = splashScene.SplashScene(mainApp, input, music, db)
+    # player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
+    # player1 = player.Player("CPU", countries.CountryOptions.QBC, 1, mainApp)
+    # currentScene = gameScene.GameScene(mainApp, input, music, db,
+    #                                    musicTrack.GameTracks.SEMI_CHARMED_LIFE,
+    #                                    (player0, player1))
 
     # db.addPlayerResult(player0, True)
     # db.addPlayerResult(player1, False)
