@@ -34,6 +34,7 @@ class Player:
             pygame.SRCALPHA)
 
         self._trackSection: musicTrack.TrackSection
+        self._attackChiThresholds: dict[attackUtils.AttackType, int]
 
         self._noteSheet = noteSheet.NoteSheet(playerID, self._playerHalf)
         self._chiBar = chiBar.ChiBar(playerID, self._playerHalf)
@@ -68,7 +69,7 @@ class Player:
         self._savedAttack = newVal
 
     def useAttack(self):
-        self._currentChi -= attackUtils.attackChiThresholds[self._savedAttack]
+        self._currentChi -= self._attackChiThresholds[self._savedAttack]
 
     def registerEnemyAttack(self, enemyAttack: attackUtils.AttackType):
         self._health -= attackUtils.attackDamage[enemyAttack]
@@ -78,6 +79,10 @@ class Player:
 
     def setAnimationManager(self, animManager: animations.AnimationManager):
         self._sprite.setAnimationManager(animManager)
+
+    def setChiThresholds(self, thresholds: dict[attackUtils.AttackType, int]):
+        self._attackChiThresholds = thresholds
+        self._chiBar.setChiThresholds(thresholds)
 
     def changeAnimation(self,
                         newAnimation: animations.PlayerAnimations,
@@ -197,7 +202,7 @@ class Player:
                 if gameState == gameStates.GameState.WAIT_FOR_ATTACK:
                     if btn == inputManager.attackBtn:
                         attackType = attackUtils.getAttackType(
-                            self._currentChi)
+                            self._currentChi, self._attackChiThresholds)
                         self._savedAttack = attackType
 
         self._updateNoteStatus(musicElapsedTime)
@@ -206,14 +211,16 @@ class Player:
         self._chiBar.update(self._currentChi, self._totalChi)
 
         self._sprite.update(self._health)
-        if gameState != gameStates.GameState.FIGHT_SCENE:
+        if gameState not in (gameStates.GameState.FIGHT_SCENE,
+                             gameStates.GameState.END):
             if self._sprite.currentAnimation.isAnimationFinished():
                 self.changeAnimation(animations.PlayerAnimations.STAND)
 
         if gameState == gameStates.GameState.WAIT_FOR_ATTACK:
             if self._cpu and self._savedAttack == attackUtils.AttackType.PasChoisi:
                 if random.choice([True, False]):
-                    attackType = attackUtils.getAttackType(self._currentChi)
+                    attackType = attackUtils.getAttackType(
+                        self._currentChi, self._attackChiThresholds)
                     self._savedAttack = attackType
                 else:
                     self._savedAttack = attackUtils.AttackType.Rien
