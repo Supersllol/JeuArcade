@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pygame, os
 from AA.AA_scenes import sceneClass, gameScene
 from AA.AA_utils import inputManager, musicManager, dbManager, settings, fontManager, misc
@@ -33,7 +35,7 @@ class TrackSelectionScene(sceneClass.Scene):
         }
 
         sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH), "AA",
-                                                                        "AA_sfx")
+                                  "AA_sfx")
 
         self._sounds = {
             "option": pygame.mixer.Sound(os.path.join(sounds_dir,
@@ -93,7 +95,7 @@ class TrackSelectionScene(sceneClass.Scene):
 
         currentTrack = self.trackChoices[self.currentChoice]
         songTitle = fontManager.upheaval(
-            f"{currentTrack.songName} ({currentTrack.songBPM} BPM)", 35,
+            f"{currentTrack.songName} ({currentTrack.songBPM} BPM)", 30,
             (255, 255, 255))
         panel.blit(songTitle,
                    songTitle.get_rect(center=(panel.get_rect().centerx, 500)))

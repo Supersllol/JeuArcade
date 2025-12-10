@@ -4,7 +4,7 @@ import random
 import json
 import pygame
 
-name = "Take on Me"
+name = "What Is Love"
 y, sr = librosa.load(f"{name}.mp3")
 
 # Detect beats

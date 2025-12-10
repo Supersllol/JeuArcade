@@ -33,11 +33,13 @@ class HomeScene(Scene):
         icon_dir = os.path.join(images_dir, "AA_input_instruction")
         # SFX live one level above AA (e.g., JeuArcade/AA_sfx), so hop up a directory
         sounds_dir = os.path.join(os.path.dirname(settings.PARENT_PATH), "AA",
-                                                                        "AA_sfx")
-        
+                                  "AA_sfx")
+
         self._sounds = {
-            "select": pygame.mixer.Sound(os.path.join(sounds_dir, "Select.wav")),
-            "option" : pygame.mixer.Sound(os.path.join(sounds_dir, "Option.wav"))
+            "select": pygame.mixer.Sound(os.path.join(sounds_dir,
+                                                      "Select.wav")),
+            "option": pygame.mixer.Sound(os.path.join(sounds_dir,
+                                                      "Option.wav"))
         }
 
         # Load background and scale to window
@@ -221,7 +223,9 @@ class HomeScene(Scene):
         seconds_per_beat = 60.0 / max(self._heart_bpm, 1)
         phase_in_beat = music_time % seconds_per_beat
         # Map phase to cache index
-        self._title_cache_index = int((phase_in_beat / seconds_per_beat) * len(self._title_cache)) % len(self._title_cache)
+        self._title_cache_index = int(
+            (phase_in_beat / seconds_per_beat) * len(self._title_cache)) % len(
+                self._title_cache)
 
         # Update glow animation based on frame timer
         if self._animation_time <= self._stateTimer.elapsed():
@@ -246,7 +250,6 @@ class HomeScene(Scene):
                                                          onlyCheckForNew=True)
             if inputManager.ButtonInputs.A in new_btns:
                 # Trigger action
-                print(f"Selected: {self.btn_names[self.selected_index]}")
                 self.sceneFinished = True
                 self._sounds["select"].play()
 

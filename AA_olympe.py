@@ -35,8 +35,8 @@ def main():
     #                                          ("SIM", "CPU"))
     currentScene = splashScene.SplashScene(mainApp, input, music, db)
 
-    player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
-    player1 = player.Player("CPU", countries.CountryOptions.QBC, 1, mainApp)
+    # player0 = player.Player("SIM", countries.CountryOptions.QBC, 0, mainApp)
+    # player1 = player.Player("CPU", countries.CountryOptions.QBC, 1, mainApp)
     # currentScene = trackSelectionScene.TrackSelectionScene(
     #     mainApp, input, music, db, (player0, player1))
     #currentScene = gameScene.GameScene(mainApp, input, music, db,
