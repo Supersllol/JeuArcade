@@ -69,7 +69,7 @@ class Player:
         self._savedAttack = newVal
 
     def useAttack(self):
-        self._currentChi -= self._attackChiThresholds[self._savedAttack]
+        self._currentChi = 0
 
     def registerEnemyAttack(self, enemyAttack: attackUtils.AttackType):
         self._health -= attackUtils.attackDamage[enemyAttack]

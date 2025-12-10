@@ -31,7 +31,7 @@ class GameScene(sceneClass.Scene):
         self._fightOrder: list[player.Player] = []
 
         # TODO
-        self._attackChiThresholds = attackUtils.attackChiThresholds
+        self._attackChiThresholds = self._chosenTrack.getChiThresholds()
 
         self._fadeOutStarted = False
 

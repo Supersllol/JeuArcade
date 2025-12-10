@@ -1,6 +1,6 @@
 from __future__ import annotations
 import json, os, pygame, math
-from AA.AA_utils import settings
+from AA.AA_utils import settings, attackUtils, score
 from enum import Enum
 
 
@@ -124,6 +124,28 @@ class TrackBeatMap:
                   encoding="utf8") as file:
             self._beatMap = json.load(file)
             self._nbrSections = len(self._beatMap["sections"])
+            self._nbrNotes = self._beatMap["numNotes"]
+
+    def getChiThresholds(self):
+        thresholds: list[tuple[attackUtils.AttackType, float]] = []
+        thresholds.append((attackUtils.AttackType.CoupPoing,
+                           score.hitChiScore[score.HitType.Bien] * 0.6 * 0.2 *
+                           self._nbrNotes))  # 60% bien pour 20% chanson
+        thresholds.append((attackUtils.AttackType.CoupPied,
+                           score.hitChiScore[score.HitType.Parfait] * 0.3 *
+                           0.4 * self._nbrNotes))
+        thresholds.append((attackUtils.AttackType.DoubleCoupPoing,
+                           (score.hitChiScore[score.HitType.Parfait] * 0.55 *
+                            0.4 * self._nbrNotes)))
+        thresholds.append(
+            (attackUtils.AttackType.Hadoken,
+             score.hitChiScore[score.HitType.Parfait] * 0.9 * 0.4 *
+             self._nbrNotes))  # 90% parfait pour 40% chanson
+
+        return {
+            threshold[0]: int(round(threshold[1] / 100.0, 0) * 100)
+            for threshold in thresholds
+        }
 
     @property
     def nbrSections(self):

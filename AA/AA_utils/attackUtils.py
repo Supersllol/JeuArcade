@@ -19,13 +19,6 @@ attackDamage = {
     AttackType.Hadoken: 10
 }
 
-attackChiThresholds = {
-    AttackType.CoupPoing: 5000,
-    AttackType.CoupPied: 10000,
-    AttackType.DoubleCoupPoing: 17500,
-    AttackType.Hadoken: 30000
-}
-
 
 def getAttackType(chiValue: int, attackThresholds: dict[AttackType, int]):
     if chiValue < attackThresholds[AttackType.CoupPoing]:

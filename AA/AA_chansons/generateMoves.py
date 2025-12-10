@@ -14,10 +14,11 @@ tempo, beats = librosa.beat.beat_track(y=y, sr=sr, units='time')
 timestamps = sorted(set(list(beats)))
 
 # Prepare JSON structure
-data = {"songLength": None, "sections": {}, "notes": []}
+data = {"songLength": None, "numNotes": None, "sections": {}, "notes": []}
 pygame.init()
 songLength = pygame.mixer.Sound(f"{name}.mp3").get_length()
 data["songLength"] = songLength
+data["numNotes"] = len(timestamps)
 
 for i in range(6):
     quartile = songLength / 6
