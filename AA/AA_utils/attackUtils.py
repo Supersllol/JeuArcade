@@ -27,14 +27,14 @@ attackChiThresholds = {
 }
 
 
-def getAttackType(chiValue: int):
-    if chiValue < attackChiThresholds[AttackType.CoupPoing]:
+def getAttackType(chiValue: int, attackThresholds: dict[AttackType, int]):
+    if chiValue < attackThresholds[AttackType.CoupPoing]:
         return AttackType.Rien
-    elif chiValue < attackChiThresholds[AttackType.CoupPied]:
+    elif chiValue < attackThresholds[AttackType.CoupPied]:
         return AttackType.CoupPoing
-    elif chiValue < attackChiThresholds[AttackType.DoubleCoupPoing]:
+    elif chiValue < attackThresholds[AttackType.DoubleCoupPoing]:
         return AttackType.CoupPied
-    elif chiValue < attackChiThresholds[AttackType.Hadoken]:
+    elif chiValue < attackThresholds[AttackType.Hadoken]:
         return AttackType.DoubleCoupPoing
     else:
         return AttackType.Hadoken

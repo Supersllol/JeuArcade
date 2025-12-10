@@ -30,6 +30,9 @@ class GameScene(sceneClass.Scene):
 
         self._fightOrder: list[player.Player] = []
 
+        # TODO
+        self._attackChiThresholds = attackUtils.attackChiThresholds
+
         self._fadeOutStarted = False
 
         self._gameState = gameStates.GameState.PRE_COUNTDOWN_DELAY
@@ -53,10 +56,11 @@ class GameScene(sceneClass.Scene):
         for player in self._players:
             player.loadSection(self._playerSections[
                 self._currentTrackSectionID][player._playerID])
-        
+            player.setChiThresholds(self._attackChiThresholds)
+
         # Stop menu music before starting game music
         self._musicManager.stop()
-        
+
         super().initScene()
 
     def _chooseNextSection(self):
@@ -113,9 +117,9 @@ class GameScene(sceneClass.Scene):
         if len(playersWithAttack) == 1:
             return playersWithAttack
         player0, player1 = playersWithAttack[0], playersWithAttack[1]
-        deltaScorePlayer0, deltaScorePlayer1 = player0.currentChi - attackUtils.attackChiThresholds[
+        deltaScorePlayer0, deltaScorePlayer1 = player0.currentChi - self._attackChiThresholds[
             player0.
-            savedAttack], player1.currentChi - attackUtils.attackChiThresholds[
+            savedAttack], player1.currentChi - self._attackChiThresholds[
                 player1.savedAttack]
         if deltaScorePlayer0 == deltaScorePlayer1:
             random.shuffle(playersWithAttack)
